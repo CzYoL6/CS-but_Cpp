@@ -87,6 +87,12 @@ namespace GGgui {
         //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
         //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
+        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
+        glfwWindowHint(GLFW_FLOATING, 1);
+        glfwWindowHint(GLFW_MAXIMIZED, 1);
+//        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+//        glfwWindowHint(GLFW_MOUSE_PASSTHROUGH, GLFW_TRUE);
+
 
         // Create window with graphics context
         m_WindowHandle = glfwCreateWindow(m_Specification.Width, m_Specification.Height, m_Specification.Name.c_str(),
@@ -96,7 +102,7 @@ namespace GGgui {
             return;
         }
         glfwMakeContextCurrent(m_WindowHandle);
-        glfwSwapInterval(1); // Enable vsync
+        glfwSwapInterval(0);
 
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
@@ -105,14 +111,16 @@ namespace GGgui {
         (void) io;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
         //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+//        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-        //io.ConfigViewportsNoAutoMerge = true;
+
+        // do not auto merge, so when the glfw enables mouse passthrough, the window inside the main viewport wont be unclickable
+        io.ConfigViewportsNoAutoMerge = true;
         //io.ConfigViewportsNoTaskBarIcon = true;
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
-        //ImGui::StyleColorsClassic();
+//        ImGui::StyleColorsClassic();
 
         // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
         ImGuiStyle &style = ImGui::GetStyle();
@@ -168,7 +176,7 @@ namespace GGgui {
     void Application::Run() {
         m_Running = true;
 
-        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 0.0f);
         auto &io = ImGui::GetIO();
 
         spdlog::warn("Application successfully launched.");
@@ -188,51 +196,56 @@ namespace GGgui {
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
+            // To set mouse paththrough, we need to set viewport flags, or set glfw hint here, cuz ImGui_ImplGlfw_NewFrame()
+            // override that hint.
+            ImGuiViewport* viewport = ImGui::GetMainViewport();
+            viewport->Flags |= ImGuiViewportFlags_NoInputs;
+
             // Render custom UI
             for (auto& layer : m_LayerStack)
                 layer->OnUpdate(m_TimeStep);
 
             {
-                static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+//                static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
                 // We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
                 // because it would be confusing to have two docking targets within each others.
-                ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
-                if (m_MenubarCallback)
-                    window_flags |= ImGuiWindowFlags_MenuBar;
+//                ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+//                if (m_MenubarCallback)
+//                    window_flags |= ImGuiWindowFlags_MenuBar;
 
-                const ImGuiViewport* viewport = ImGui::GetMainViewport();
-                ImGui::SetNextWindowPos(viewport->WorkPos);
-                ImGui::SetNextWindowSize(viewport->WorkSize);
-                ImGui::SetNextWindowViewport(viewport->ID);
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-                window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-                window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+//                const ImGuiViewport* viewport = ImGui::GetMainViewport();
+//                ImGui::SetNextWindowPos(viewport->WorkPos);
+//                ImGui::SetNextWindowSize(viewport->WorkSize);
+//                ImGui::SetNextWindowViewport(viewport->ID);
+//                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+//                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+//                window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize ;
+//                window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
                 // When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
                 // and handle the pass-thru hole, so we ask Begin() to not render a background.
-                if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-                    window_flags |= ImGuiWindowFlags_NoBackground;
+//                if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+//                    window_flags |= ImGuiWindowFlags_NoBackground;
 
                 // Important: note that we proceed even if Begin() returns false (aka window is collapsed).
                 // This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
                 // all active windows docked into it will lose their parent and become undocked.
                 // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
                 // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-                ImGui::Begin("DockSpace Demo", nullptr, window_flags);
-                ImGui::PopStyleVar();
+//                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+//                ImGui::Begin("DockSpace Demo", nullptr, window_flags);
+//                ImGui::PopStyleVar();
 
-                ImGui::PopStyleVar(2);
+//                ImGui::PopStyleVar(2);
 
                 // Submit the DockSpace
-                ImGuiIO& io = ImGui::GetIO();
-                if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-                {
-                    ImGuiID dockspace_id = ImGui::GetID("VulkanAppDockspace");
-                    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-                }
+//                ImGuiIO& io = ImGui::GetIO();
+//                if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+//                {
+//                    ImGuiID dockspace_id = ImGui::GetID("VulkanAppDockspace");
+//                    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+//                }
 
                 if (m_MenubarCallback)
                 {
@@ -255,8 +268,8 @@ namespace GGgui {
             int display_w, display_h;
             glfwGetFramebufferSize(m_WindowHandle, &display_w, &display_h);
             glViewport(0, 0, display_w, display_h);
-            glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w,
-                         clear_color.w);
+//            glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+            glClearColor(0,0,0,0);
             glClear(GL_COLOR_BUFFER_BIT);
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
