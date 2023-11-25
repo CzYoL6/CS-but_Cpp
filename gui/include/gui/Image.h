@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include <string_view>
-
+#include <cstdint>
 #include <stb_image/stb_image.h>
 #include <GL/gl.h>
 
