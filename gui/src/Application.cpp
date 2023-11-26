@@ -14,6 +14,7 @@
 #include <glm/glm.hpp>
 #include <stb_image/stb_image.h>
 #include <spdlog/spdlog.h>
+#include <soloud_wav.h>
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -57,6 +58,11 @@ namespace GGgui {
     }
 
     void Application::Init() {
+        _soloud_core.init();
+        for(int i = 0; i < 5; i++){
+            _wav_ass.emplace(std::make_shared<SoLoud::Wav>());
+        }
+
 // Setup window
         glfwSetErrorCallback(glfw_error_callback);
         if (!glfwInit()) {
@@ -157,6 +163,8 @@ namespace GGgui {
     }
 
     void Application::Shutdown() {
+        _soloud_core.deinit();
+
         for (auto &layer: m_LayerStack)
             layer->OnDetach();
 
@@ -304,5 +312,14 @@ namespace GGgui {
 
     float Application::GetTime() {
         return (float) glfwGetTime();
+    }
+
+    void Application::PlaySound(std::string_view audio_path) {
+        auto as = _wav_ass.front();
+        _wav_ass.pop();
+        _wav_ass.push(as);
+
+        as->load(audio_path.data());
+        _soloud_core.play(*as);
     }
 }

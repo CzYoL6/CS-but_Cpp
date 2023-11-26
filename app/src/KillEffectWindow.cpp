@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <spdlog/spdlog.h>
 #include <app/KillEffectWindow.h>
+#include <gui/Application.h>
 
 KillEffectWindow* KillEffectWindow::_instance = nullptr;
 
@@ -47,9 +48,9 @@ void KillEffectWindow::OnUpdate(float ts) {
     Layer::OnUpdate(ts);
 //    spdlog::info("timestep: {}s\n", ts);
     if(_continuous_kill_count > 0){
-        _countinuous_kill_timer += ts;
-        if(_countinuous_kill_timer >= _max_continuous_kill_time){
-            _countinuous_kill_timer = 0;
+        _continuous_kill_timer += ts;
+        if(_continuous_kill_timer >= _max_continuous_kill_time){
+            _continuous_kill_timer = 0;
             _continuous_kill_count = 0;
         }
     }
@@ -61,6 +62,8 @@ void KillEffectWindow::ShowKillEffect() {
     assert(_continuous_kill_count <= _max_continuous_kill_count);
     std::cout << _continuous_kill_count << '\n';
     _image_sequence_player->ResetImageSequence(_image_buffer[_continuous_kill_count - 1]);
+    auto &app = GGgui::Application::Get();
+    app.PlaySound(std::format("./Assets/audio/{}kill.wav", _continuous_kill_count));
     _image_sequence_player->Play();
 }
 
@@ -99,7 +102,7 @@ void KillEffectWindow::AddKillCount(int c) {
     if(_continuous_kill_count > _max_continuous_kill_count) {
         _continuous_kill_count = _max_continuous_kill_count;
     }
-    _countinuous_kill_timer = 0;
+    _continuous_kill_timer = 0;
 
 
 }

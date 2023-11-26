@@ -4,11 +4,15 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <queue>
 
 #include <imgui/imgui.h>
 #include <GLFW/glfw3.h>
 #include <gui/Image.h>
 #include <gui/Layer.h>
+#include <soloud.h>
+#include <filesystem>
+#include <soloud_wav.h>
 
 struct GLFWwindow;
 
@@ -47,6 +51,8 @@ namespace GGgui {
         float GetSmoothedFps(){return m_SmoothedFps;}
         GLFWwindow* GetWindowHandle() const { return m_WindowHandle; }
 
+        void PlaySound(std::string_view  audio_path);
+
     private:
         void Init();
         void Shutdown();
@@ -64,6 +70,9 @@ namespace GGgui {
 
         std::vector<std::shared_ptr<Layer>> m_LayerStack;
         std::function<void()> m_MenubarCallback;
+
+        SoLoud::Soloud _soloud_core;
+        std::queue<std::shared_ptr<SoLoud::Wav>> _wav_ass;
     };
 
     // Implemented by CLIENT

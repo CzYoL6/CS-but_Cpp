@@ -6,5 +6,5 @@ target_link_libraries(GGgui PUBLIC glm)
 target_link_libraries(GGgui PUBLIC stb_image)
 target_link_libraries(GGgui PUBLIC spdlog)
 target_link_libraries(GGgui PUBLIC opengl32)
-
+target_link_libraries(GGgui PUBLIC soloud)
 target_include_directories(GGgui PUBLIC include)

@@ -44,7 +44,7 @@ private:
     int _continuous_kill_count{0};
     int _max_continuous_kill_count{5};
     float _max_continuous_kill_time{5};
-    float _countinuous_kill_timer{0};
+    float _continuous_kill_timer{0};
 
     std::filesystem::path _image_folder_path{"./Assets/banner/"};        // where kill banners are stored
                                                                   // the folder structure must be
