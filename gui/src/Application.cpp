@@ -63,7 +63,26 @@ namespace GGgui {
             _wav_ass.emplace(std::make_shared<SoLoud::Wav>());
         }
 
-// Setup window
+        _http_server.Post("/", [this](const httplib::Request &req, httplib::Response &res) {
+            std::cout << req.body << std::endl;
+//                PlaySound("1kill.wav");
+            data_mutex.lock();
+            data=true;
+            data_mutex.unlock();
+            res.set_content("", "text/html");
+            res.set_header("Content-Type", "text/html" );
+            res.status=200;
+        });
+
+        _http_server_thread = std::thread([&]{
+            spdlog::warn("http server launched.");
+           _http_server.listen("127.0.0.1", 3003);
+        });
+
+        (void)_http_server_thread;
+
+
+        // Setup window
         glfwSetErrorCallback(glfw_error_callback);
         if (!glfwInit()) {
 //            std::cerr << "Could not initalize GLFW!\n";
@@ -301,6 +320,17 @@ namespace GGgui {
             m_LastFrameTime = time;
             m_SmoothedFrameTime = smooth_ratio * m_SmoothedFrameTime + (1 - smooth_ratio) * m_FrameTime;
             m_SmoothedFps = (uint32_t)(1.0f / m_SmoothedFrameTime);
+
+
+
+
+            data_mutex.lock();
+            if(data){
+                PlaySound("1kill.wav");
+                data = false;
+            }
+            data_mutex.unlock();
+
         }
 
     }

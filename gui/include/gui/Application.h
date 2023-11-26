@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 #include <vector>
 #include <memory>
@@ -13,6 +12,9 @@
 #include <soloud.h>
 #include <filesystem>
 #include <soloud_wav.h>
+#include <httplib.h>
+
+//#define CPPHTTPLIB_OPENSSL_SUPPORT
 
 struct GLFWwindow;
 
@@ -73,6 +75,12 @@ namespace GGgui {
 
         SoLoud::Soloud _soloud_core;
         std::queue<std::shared_ptr<SoLoud::Wav>> _wav_ass;
+
+        httplib::Server _http_server;
+        std::thread _http_server_thread;
+        std::mutex data_mutex;
+        bool data = false;
+
     };
 
     // Implemented by CLIENT
