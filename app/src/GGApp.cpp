@@ -5,7 +5,8 @@
 #include <GLFW/glfw3.h>
 
 #include <stb_image/stb_image.h>
-#include <app/setting_window.h>
+#include <app/SettingWindow.h>
+#include <app/KillEffectWindow.h>
 
 
 GGgui::Application* GGgui::CreateApplication(int argc, char** argv)
@@ -15,7 +16,7 @@ GGgui::Application* GGgui::CreateApplication(int argc, char** argv)
 
 	auto* app = new GGgui::Application(spec);
 	app->PushLayer<SettingWindow>();
-
+    app->PushLayer<KillEffectWindow>();
 
 	return app;
 }

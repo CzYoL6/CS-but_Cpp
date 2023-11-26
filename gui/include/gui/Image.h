@@ -1,7 +1,7 @@
 //
 // Created by zaiyi on 2023/8/14.
 //
-#pragma
+#pragma once
 
 #include <iostream>
 #include <string_view>
@@ -18,6 +18,8 @@ namespace GGgui {
         Image(const std::string_view &file_path);
 
         Image(unsigned char *image_data, int width, int height);
+
+        ~Image();
 
         void LoadDataFromMemory(unsigned char *image_data, int width, int height);
 

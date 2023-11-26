@@ -4257,7 +4257,7 @@ void ImGui::UpdateMouseWheel()
 {
     ImGuiContext& g = *GImGui;
 
-    // Reset the locked window if we move the mouse or after the timer elapses
+    // SetToBuffer the locked window if we move the mouse or after the timer elapses
     if (g.WheelingWindow != NULL)
     {
         g.WheelingWindowTimer -= g.IO.DeltaTime;
@@ -13522,7 +13522,7 @@ static void ImGui::UpdateViewportsNewFrame()
         viewport->BuildWorkOffsetMin = viewport->BuildWorkOffsetMax = ImVec2(0.0f, 0.0f);
         viewport->UpdateWorkRect();
 
-        // Reset alpha every frame. Users of transparency (docking) needs to request a lower alpha back.
+        // SetToBuffer alpha every frame. Users of transparency (docking) needs to request a lower alpha back.
         viewport->Alpha = 1.0f;
 
         // Translate Dear ImGui windows when a Host Viewport has been moved
@@ -19210,7 +19210,7 @@ void ImGui::DebugNodeViewport(ImGuiViewportP* viewport)
             viewport->Pos.x, viewport->Pos.y, viewport->Size.x, viewport->Size.y,
             viewport->WorkOffsetMin.x, viewport->WorkOffsetMin.y, viewport->WorkOffsetMax.x, viewport->WorkOffsetMax.y,
             viewport->PlatformMonitor, viewport->DpiScale * 100.0f);
-        if (viewport->Idx > 0) { SameLine(); if (SmallButton("Reset Pos")) { viewport->Pos = ImVec2(200, 200); viewport->UpdateWorkRect(); if (viewport->Window) viewport->Window->Pos = viewport->Pos; } }
+        if (viewport->Idx > 0) { SameLine(); if (SmallButton("SetToBuffer Pos")) { viewport->Pos = ImVec2(200, 200); viewport->UpdateWorkRect(); if (viewport->Window) viewport->Window->Pos = viewport->Pos; } }
         BulletText("Flags: 0x%04X =%s%s%s%s%s%s%s%s%s%s%s%s", viewport->Flags,
             //(flags & ImGuiViewportFlags_IsPlatformWindow) ? " IsPlatformWindow" : "", // Omitting because it is the standard
             (flags & ImGuiViewportFlags_IsPlatformMonitor) ? " IsPlatformMonitor" : "",

@@ -51,4 +51,8 @@ namespace GGgui {
         image_width_ = image_height_ = 0;
     }
 
+    Image::~Image() {
+        Release();
+    }
+
 }

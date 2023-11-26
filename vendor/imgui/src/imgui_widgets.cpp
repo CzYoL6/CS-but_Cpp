@@ -2815,7 +2815,7 @@ bool ImGui::SliderBehaviorT(const ImRect& bb, ImGuiID id, ImGuiDataType data_typ
         {
             if (g.ActiveIdIsJustActivated)
             {
-                g.SliderCurrentAccum = 0.0f; // Reset any stored nav delta upon activation
+                g.SliderCurrentAccum = 0.0f; // SetToBuffer any stored nav delta upon activation
                 g.SliderCurrentAccumDirty = false;
             }
 

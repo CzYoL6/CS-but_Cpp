@@ -2298,7 +2298,7 @@ struct IMGUI_API ImGuiWindow
     ImGuiViewportP*         Viewport;                           // Always set in Begin(), only inactive windows may have a NULL value here
     ImGuiID                 ViewportId;                         // We backup the viewport id (since the viewport may disappear or never be created if the window is inactive)
     ImVec2                  ViewportPos;                        // We backup the viewport position (since the viewport may disappear or never be created if the window is inactive)
-    int                     ViewportAllowPlatformMonitorExtend; // Reset to -1 every frame (index is guaranteed to be valid between NewFrame..EndFrame), only used in the Appearing frame of a tooltip/popup to enforce clamping to a given monitor
+    int                     ViewportAllowPlatformMonitorExtend; // SetToBuffer to -1 every frame (index is guaranteed to be valid between NewFrame..EndFrame), only used in the Appearing frame of a tooltip/popup to enforce clamping to a given monitor
     ImVec2                  Pos;                                // Position (always rounded-up to nearest pixel)
     ImVec2                  Size;                               // Current size (==SizeFull or collapsed title bar size)
     ImVec2                  SizeFull;                           // Size when non collapsed
@@ -2670,7 +2670,7 @@ struct IMGUI_API ImGuiTable
     ImGuiTableColumnIdx         HoveredColumnBody;          // Index of column whose visible region is being hovered. Important: == ColumnsCount when hovering empty region after the right-most column!
     ImGuiTableColumnIdx         HoveredColumnBorder;        // Index of column whose right-border is being hovered (for resizing).
     ImGuiTableColumnIdx         AutoFitSingleColumn;        // Index of single column requesting auto-fit.
-    ImGuiTableColumnIdx         ResizedColumn;              // Index of column being resized. Reset when InstanceCurrent==0.
+    ImGuiTableColumnIdx         ResizedColumn;              // Index of column being resized. SetToBuffer when InstanceCurrent==0.
     ImGuiTableColumnIdx         LastResizedColumn;          // Index of column being resized from previous frame.
     ImGuiTableColumnIdx         HeldHeaderColumn;           // Index of column header being held.
     ImGuiTableColumnIdx         ReorderColumn;              // Index of column being reordered. (not cleared)

@@ -259,7 +259,7 @@ namespace GGgui {
                 for (auto& layer : m_LayerStack)
                     layer->OnUIRender();
 
-                ImGui::End();
+//                ImGui::End();
             }
 
 
