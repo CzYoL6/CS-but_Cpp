@@ -7,12 +7,15 @@
 #include <spdlog/spdlog.h>
 #include <app/KillEffectWindow.h>
 #include <gui/Application.h>
+#include <gui/Application.h>
+#include <app/SettingWindow.h>
 
 KillEffectWindow* KillEffectWindow::_instance = nullptr;
 
 void KillEffectWindow::OnUIRender() {
     Layer::OnUIRender();
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking;
+    const auto& app = GGgui::Application::Get();
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration;
     if(!_hidden) {
         const auto viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos({0,0});
@@ -21,8 +24,10 @@ void KillEffectWindow::OnUIRender() {
 
         ImGui::Begin("Kill Effect Window", nullptr, window_flags);
         if(_frame_buffer->gl_texture_id() != 0 && _image_sequence_player->playing()){
+            Settings& settings = Settings::Get();
             float factor =  ImGui::GetWindowWidth() / 3840.0f;
-            ImGui::SetCursorPos({1400 * factor, 1400 * factor});
+            ImGui::SetCursorPos({ImGui::GetWindowWidth()*0.5f +  - factor*_frame_buffer->image_width()*0.5f + settings.offset_x, ImGui::GetWindowHeight()*0.5f - factor*_frame_buffer->image_height() + settings.offset_y});
+//            std::cout <<ImGui::GetWindowWidth()*0.5f +  - factor*_frame_buffer->image_width()*0.5f + offset_x<<","<<ImGui::GetWindowHeight()*0.5f - factor*_frame_buffer->image_height()*0.5f + offset_y<<'\n';
             ImGui::Image(ImTextureID(_frame_buffer->gl_texture_id()),
                          {factor * _frame_buffer->image_width(), factor * _frame_buffer->image_height()});
         }
@@ -70,7 +75,7 @@ void KillEffectWindow::OnUpdate(float ts) {
 //    spdlog::info("timestep: {}s\n", ts);
     if(_continuous_kill_count > 0){
         _continuous_kill_timer += ts;
-        if(_continuous_kill_timer >= _max_continuous_kill_time){
+        if(_continuous_kill_timer >= Settings::Get().max_continuous_kill_time_sec){
             _continuous_kill_timer = 0;
             _continuous_kill_count = 0;
         }

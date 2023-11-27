@@ -53,7 +53,8 @@ namespace GGgui {
         GLFWwindow* GetWindowHandle() const { return m_WindowHandle; }
 
         void PlayAudio(std::string_view  audio_path);
-
+    public:
+        GLFWwindow* window_handle() const{return m_WindowHandle;}
     private:
         void Init();
         void Shutdown();
@@ -74,8 +75,9 @@ namespace GGgui {
 
         SoLoud::Soloud _soloud_core;
         std::queue<std::shared_ptr<SoLoud::Wav>> _wav_ass;
-
-
+    public:
+        int _monitor_width, _monitor_height;
+        float _monitor_aspect_ratio;
 
     };
 

@@ -38,6 +38,13 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
+void get_resolution(int &window_width, int &window_height) {
+    const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+    window_width = mode->width;
+    window_height = mode->height;
+}
+
 namespace GGgui {
 
     Application::Application(const ApplicationSpecification &specification)
@@ -96,7 +103,7 @@ namespace GGgui {
         glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
         glfwWindowHint(GLFW_FLOATING, 1);
         glfwWindowHint(GLFW_MAXIMIZED, 1);
-//        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 //        glfwWindowHint(GLFW_MOUSE_PASSTHROUGH, GLFW_TRUE);
 
 
@@ -110,23 +117,25 @@ namespace GGgui {
         glfwMakeContextCurrent(m_WindowHandle);
         glfwSwapInterval(0);
 
+        glfwHideWindow(m_WindowHandle);
+
+
+
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
         (void) io;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-//        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
         // do not auto merge, so when the glfw enables mouse passthrough, the window inside the main viewport wont be unclickable
         io.ConfigViewportsNoAutoMerge = true;
-        //io.ConfigViewportsNoTaskBarIcon = true;
+        io.ConfigWindowsResizeFromEdges = true;
+//        io.ConfigViewportsNoTaskBarIcon = true;
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
-//        ImGui::StyleColorsClassic();
 
         // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
         ImGuiStyle &style = ImGui::GetStyle();
@@ -142,7 +151,7 @@ namespace GGgui {
         // Load default font
         ImFontConfig fontConfig;
         fontConfig.FontDataOwnedByAtlas = false;
-        ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF((void *) g_RobotoRegular, sizeof(g_RobotoRegular), 20.0f,
+        ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF((void *) g_RobotoRegular, sizeof(g_RobotoRegular), 15.0f,
                                                             &fontConfig);
         io.FontDefault = robotoFont;
 
@@ -190,6 +199,17 @@ namespace GGgui {
         spdlog::warn("Application successfully launched.");
         // Main loop
         while (!glfwWindowShouldClose(m_WindowHandle) && m_Running) {
+            int monitor_width, monitor_height;
+            glfwMaximizeWindow(m_WindowHandle);
+//            get_resolution(monitor_width, monitor_height);
+//            if(monitor_height != _monitor_height || monitor_width != _monitor_width){
+//                glfwSetWindowSize(m_WindowHandle, monitor_width, monitor_height);
+//                _monitor_width = monitor_width;
+//                _monitor_height = monitor_height;
+//                _monitor_aspect_ratio = 1.0f * _monitor_width / _monitor_height;
+//            }
+
+
             // Poll and handle events (inputs, window resize, etc.)
             // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
             // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.

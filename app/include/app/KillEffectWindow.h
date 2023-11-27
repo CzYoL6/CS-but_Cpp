@@ -37,16 +37,14 @@ private:
 public:
     bool hidden() const { return _hidden; }
     int continuous_kill_count() const { return _continuous_kill_count;}
-    void set_continuous_kill_time(float t) { _max_continuous_kill_time = t;}
     void set_max_ckc(int c) { _max_continuous_kill_count = c; }
 private:
     std::shared_ptr<ImageSequencePlayer> _image_sequence_player{nullptr};
     std::shared_ptr<GGgui::Image> _frame_buffer{nullptr};
     std::vector<std::shared_ptr<std::vector<std::shared_ptr<EffectImage>>>> _image_buffer;
-    bool _hidden{false};
+    bool _hidden{true};
     int _continuous_kill_count{0};
     int _max_continuous_kill_count{5};
-    float _max_continuous_kill_time{5};
     float _continuous_kill_timer{0};
     std::mutex _continuous_kill_mutex;
 
@@ -63,6 +61,7 @@ private:
 
     httplib::Server _http_server;
     std::thread _http_server_thread;
+
 };
 
 
