@@ -38,13 +38,18 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-void get_resolution(int &window_width, int &window_height) {
-    const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-    window_width = mode->width;
-    window_height = mode->height;
-}
-
+//void get_resolution(int &window_width, int &window_height) {
+//    const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+//
+//    window_width = mode->width;
+//    window_height = mode->height;
+//}
+//static void window_focus_callback(GLFWwindow* window, int focused)
+//{
+//    printf("%0.2f Window %s\n",
+//           glfwGetTime(),
+//           focused ? "focused" : "defocused");
+//}
 namespace GGgui {
 
     Application::Application(const ApplicationSpecification &specification)
@@ -118,7 +123,7 @@ namespace GGgui {
         glfwSwapInterval(0);
 
         glfwHideWindow(m_WindowHandle);
-
+//        glfwSetWindowFocusCallback(m_WindowHandle, window_focus_callback);
 
 
         // Setup Dear ImGui context
@@ -131,8 +136,8 @@ namespace GGgui {
 
         // do not auto merge, so when the glfw enables mouse passthrough, the window inside the main viewport wont be unclickable
         io.ConfigViewportsNoAutoMerge = true;
-        io.ConfigWindowsResizeFromEdges = true;
-//        io.ConfigViewportsNoTaskBarIcon = true;
+//        io.ConfigWindowsResizeFromEdges = true;
+        io.ConfigViewportsNoTaskBarIcon = true;
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();

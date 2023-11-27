@@ -88,6 +88,7 @@ public:
     virtual void OnAttach() override;
     Settings& settings() {return _settings;}
 public:
+    bool show = true;
     float assets_load_progress = 0.0f;
     bool load_complete = false;
 };
