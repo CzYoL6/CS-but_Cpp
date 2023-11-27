@@ -21,7 +21,8 @@ struct Settings{
             offset_x = setting["offset_x"].asInt();
             offset_y = setting["offset_y"].asInt();
 
-            show_effect_when_spectating = setting["show_effect_when_spectating"].asBool();
+            only_show_effect_when_im_playing = setting["only_show_effect_when_im_playing"].asBool();
+            steamid = setting["steamid"].asString();
             file.close();
         }
         else{
@@ -29,8 +30,8 @@ struct Settings{
                 R"({
                     "offset_x" : 0,
                     "offset_y" : 400,
-                    "show_effect_when_spectating" : 0
-
+                    "only_show_effect_when_im_playing" : 0
+                    "steamid" : 0
                     })";
             std::ofstream file(setting_file );
             file << setting;
@@ -44,7 +45,8 @@ struct Settings{
         setting["offset_x"] = offset_x;
         setting["offset_y"] = offset_y;
 
-        setting["show_effect_when_spectating"] = show_effect_when_spectating;
+        setting["only_show_effect_when_im_playing"] = only_show_effect_when_im_playing;
+        setting["steamid"] = steamid;
         std::filesystem::path setting_file = "./settings.json";
         std::fstream file(setting_file, std::ios_base::out);
         file << setting;
@@ -54,7 +56,8 @@ struct Settings{
     int offset_x{0};
     int offset_y{400};
 
-    bool show_effect_when_spectating{false};
+    bool only_show_effect_when_im_playing{false};
+    std::string steamid;
 };
 
 class SettingWindow : public GGgui::Layer

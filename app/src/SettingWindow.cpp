@@ -39,11 +39,6 @@ void SettingWindow::OnUIRender()
             }
 
             ImGui::SameLine();
-            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)  ImColor::HSV(54, 0.94f, 1.0f));
-            if (ImGui::Button("Hide")) {
-                show = false;
-            }
-            ImGui::PopStyleColor(1);
 
             ImGui::SameLine();
             ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(346, 0.96f, 0.82f));
@@ -52,6 +47,8 @@ void SettingWindow::OnUIRender()
             }
             ImGui::PopStyleColor(1);
 
+            ImGui::SameLine();
+            ImGui::Text("Use Ctrl+F12 to show and hide this window.");
             ImGui::Separator();
             ////////////////////////////////////////////////////////////////////////////////////////
             ImGui::Spacing();
@@ -71,7 +68,16 @@ void SettingWindow::OnUIRender()
             //////////////////////////////////////////////////////////////////////////////////////////
             ImGui::Spacing();
             ImGui::Text("Other");
-            ImGui::Checkbox("ShowEffectWhenSpectatingCheckbox", &settings.show_effect_when_spectating);
+            ImGui::Checkbox("Only show effect when I'm playing(disable when spectating)", &settings.only_show_effect_when_im_playing);
+            if(!settings.only_show_effect_when_im_playing)
+                ImGui::BeginDisabled();
+            char steamid[1024];
+            memcpy(steamid, settings.steamid.c_str(),settings.steamid.size());
+            steamid[settings.steamid.size()] = '\0';
+            ImGui::InputText("steamid", steamid, sizeof(steamid));
+            settings.steamid = steamid;
+            if(!settings.only_show_effect_when_im_playing)
+                ImGui::EndDisabled();
             ////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -99,7 +105,7 @@ void SettingWindow::OnAttach() {
             if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0) {
                 if (msg.wParam == 1) {
 //                    std::cout << "hot key" << std::endl;
-                    show = true;
+                    show = !show;
                 }
             }
         }

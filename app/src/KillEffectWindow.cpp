@@ -9,6 +9,7 @@
 #include <gui/Application.h>
 #include <gui/Application.h>
 #include <app/SettingWindow.h>
+#include <map>
 
 KillEffectWindow* KillEffectWindow::_instance = nullptr;
 
@@ -133,25 +134,32 @@ KillEffectWindow::KillEffectWindow() {
 }
 
 void KillEffectWindow::handle_data(const Json::Value &data) {
-    do {
-        if (data["player"]["steamid"].empty()) break;
-        std::string steamid = data["player"]["steamid"].asString();
-        if (steamid != "76561198863164733") {
-            break;
+    static std::string pre_steamid = "empty";
+    static int round_kills = 0;
+    if (data["player"]["steamid"].empty()) return;
+    std::string steamid = data["player"]["steamid"].asString();
+    if(SettingWindow::GetInstance().settings().only_show_effect_when_im_playing) {
+        if (steamid != SettingWindow::GetInstance().settings().steamid) {
+            return;
         }
-        if (data["player"]["state"]["round_kills"].empty()) break;
-        int cur_player_round_kill = data["player"]["state"]["round_kills"].asInt();
+    }
+    if (data["player"]["state"]["round_kills"].empty()) return;
+    int cur_player_round_kill = data["player"]["state"]["round_kills"].asInt();
+    if(steamid != pre_steamid){
+        pre_steamid = steamid;
+        round_kills = cur_player_round_kill;
+    }
 
-        if (data["previously"]["player"]["state"]["round_kills"].empty()) break;
-        int previous_player_round_kill = data["previously"]["player"]["state"]["round_kills"].asInt();
+//    if (data["previously"]["player"]["state"]["round_kills"].empty()) return;
+//    int previous_player_round_kill = data["previously"]["player"]["state"]["round_kills"].asInt();
+    int delta_round_kill = cur_player_round_kill - round_kills;
 
-        int delta_round_kill = cur_player_round_kill - previous_player_round_kill;
+    round_kills = cur_player_round_kill;
 
-        if (delta_round_kill > 0) {
-            ShowRoundKillEffect(cur_player_round_kill > _max_continuous_kill_count ?
-            _max_continuous_kill_count : cur_player_round_kill);
-        }
-    } while (false);
+    if (delta_round_kill > 0) {
+        ShowRoundKillEffect(cur_player_round_kill > _max_continuous_kill_count ?
+        _max_continuous_kill_count : cur_player_round_kill);
+    }
 
 }
 
