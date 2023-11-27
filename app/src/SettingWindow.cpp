@@ -5,6 +5,7 @@
 #include <app/KillEffectWindow.h>
 #include<Input/Input.h>
 
+SettingWindow* SettingWindow::_instance = nullptr;
 
 void SettingWindow::OnUIRender()
 {
@@ -19,43 +20,45 @@ void SettingWindow::OnUIRender()
 
     if(show) {
         ImGui::SetNextWindowSize({600, 0});
-        ImGui::Begin("Hello", nullptr,
+        ImGui::Begin("CS but Valorant", nullptr,
                      ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoBackground);
 //        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, 5);
 
         auto viewport = ImGui::GetWindowViewport();
         viewport->Flags |= ImGuiViewportFlags_TopMost;
 
-        if(KillEffectWindow::GetInstance().hidden()){
-            if(ImGui::Button("ON")){
-                KillEffectWindow::GetInstance().Show();
-                glfwShowWindow(app.window_handle());
-            }
-        }
-        else {
-            if(ImGui::Button("OFF")){
-                KillEffectWindow::GetInstance().Hide();
-                glfwHideWindow(app.window_handle());
-            }
-        }
-        ImGui::SameLine();
-        if(KillEffectWindow::GetInstance().hidden())
-            ImGui::BeginDisabled();
-        if (ImGui::Button("Test")) {
-            KillEffectWindow::GetInstance().AddKillCount_ThreadSafe(1);
-            KillEffectWindow::GetInstance().ShowKillEffect_ThreadSafe();
-        }
-        if(KillEffectWindow::GetInstance().hidden())
-            ImGui::EndDisabled();
-        ImGui::SameLine();
-        if (ImGui::Button("Close")) {
-            app.Close();
-        }
 
-        ImGui::Separator();
-        ////////////////////////////////////////////////////////////////////////////////////////
-        ImGui::Spacing();
-        ImGui::Text("Effect") ;
+        if (load_complete) {
+
+            if (KillEffectWindow::GetInstance().hidden()) {
+                if (ImGui::Button("ON")) {
+                    KillEffectWindow::GetInstance().Show();
+                    glfwShowWindow(app.window_handle());
+                }
+            } else {
+                if (ImGui::Button("OFF")) {
+                    KillEffectWindow::GetInstance().Hide();
+                    glfwHideWindow(app.window_handle());
+                }
+            }
+            ImGui::SameLine();
+            if (KillEffectWindow::GetInstance().hidden())
+                ImGui::BeginDisabled();
+            if (ImGui::Button("Test")) {
+                KillEffectWindow::GetInstance().AddKillCount_ThreadSafe(1);
+                KillEffectWindow::GetInstance().ShowKillEffect_ThreadSafe();
+            }
+            if (KillEffectWindow::GetInstance().hidden())
+                ImGui::EndDisabled();
+            ImGui::SameLine();
+            if (ImGui::Button("Close")) {
+                app.Close();
+            }
+
+            ImGui::Separator();
+            ////////////////////////////////////////////////////////////////////////////////////////
+            ImGui::Spacing();
+            ImGui::Text("Effect");
             ImGui::DragInt("Offset X", &settings.offset_x);
             ImGui::DragInt("Offset Y", &settings.offset_y);
 
@@ -68,24 +71,29 @@ void SettingWindow::OnUIRender()
 //            ImGui::Combo("FramerateCombo", &settings.high_framerate, framerates, IM_ARRAYSIZE(framerates));
 
 
-        //////////////////////////////////////////////////////////////////////////////////////////
-        ImGui::Spacing();
-        ImGui::Text("Other");
+            //////////////////////////////////////////////////////////////////////////////////////////
+            ImGui::Spacing();
+            ImGui::Text("Other");
             ImGui::RadioButton("Continuous Kill", &settings.kill_accumulate_method, 0);
             ImGui::SameLine();
             ImGui::RadioButton("Round Total Kill", &settings.kill_accumulate_method, 1);
-            if(settings.kill_accumulate_method == 1)
+            if (settings.kill_accumulate_method == 1)
                 ImGui::BeginDisabled();
             ImGui::InputFloat("MaxContinuousKillTimeSecondInputFloat", &settings.max_continuous_kill_time_sec, 0.2f,
                               1.0f,
                               "%.1f");
-            if(settings.kill_accumulate_method == 1)
+            if (settings.kill_accumulate_method == 1)
                 ImGui::EndDisabled();
             ImGui::Checkbox("ShowEffectWhenSpectatingCheckbox", &settings.show_effect_when_spectating);
             ////////////////////////////////////////////////////////////////////////////////////////////
 
 
 //        ImGui::PopStyleVar();
+        }
+        else{
+            ImGui::Text("Loading Assets...");
+            ImGui::ProgressBar(assets_load_progress);
+        }
         ImGui::End();
     }
 
@@ -94,6 +102,8 @@ void SettingWindow::OnUIRender()
 
 void SettingWindow::OnAttach() {
     Layer::OnAttach();
+
+
 }
 
 #include "app/SettingWindow.h"

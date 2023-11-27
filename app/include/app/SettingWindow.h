@@ -28,10 +28,24 @@ struct Settings{
 class SettingWindow : public GGgui::Layer
 {
 public:
+    SettingWindow(){
+        assert(_instance == nullptr);
+        _instance = this;
+    }
+private:
+    static SettingWindow* _instance;
+public:
+    static SettingWindow& GetInstance() {
+        assert(_instance != nullptr);
+        return *_instance;
+    }
+public:
     virtual void OnUIRender() override;
     virtual void OnAttach() override;
 public:
     bool show = true;
+    float assets_load_progress = 0.0f;
+    bool load_complete = false;
 };
 
 #endif //IMGUIOPENGL_SETTINGWINDOW_H

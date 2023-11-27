@@ -38,7 +38,6 @@ void KillEffectWindow::OnUIRender() {
 
 void KillEffectWindow::OnAttach() {
     Layer::OnAttach();
-    load_images_from_disk();
 
     _http_server.Post("/", [this](const httplib::Request &req, httplib::Response &res) {
 //        std::cout << req.body << std::endl;
@@ -55,6 +54,12 @@ void KillEffectWindow::OnAttach() {
     _http_server_thread = std::thread([&]{
         spdlog::warn("http server launched.");
         _http_server.listen("127.0.0.1", 3003);
+    });
+
+
+    _load_assets_thread = std::thread([this](){
+        load_images_from_disk(&SettingWindow::GetInstance().assets_load_progress,
+                              &SettingWindow::GetInstance().load_complete);
     });
 
 
@@ -97,7 +102,7 @@ void KillEffectWindow::ShowKillEffect_ThreadSafe() {
     _image_sequence_player->Play();
 }
 
-void KillEffectWindow::load_images_from_disk() {
+void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complete) {
     for(int ckc = 1; ckc <= _max_continuous_kill_count; ckc++ ) {
         std::vector<std::shared_ptr<EffectImage>> images;
 
@@ -106,9 +111,9 @@ void KillEffectWindow::load_images_from_disk() {
 //        std::filesystem::path image_folder_of_kill_count = _image_folder_path / tmp;
 //        std::filesystem::path image_folder_of_kill_count = std::format("E:\\Programming\\CS-but_Cpp\\cmake-build-release\\app\\Assets\\banner\\{}kill\\", ckc);
         std::filesystem::path image_folder_of_kill_count = std::format("E:\\AdobeWorks\\Valorant\\cropped\\{}kill\\", ckc);
-        std::cout << image_folder_of_kill_count.string() << '\n';
-        std::cout << std::filesystem::exists(image_folder_of_kill_count) << std::endl;
-        std::cout <<std::filesystem::is_directory(image_folder_of_kill_count)  << std::endl;
+//        std::cout << image_folder_of_kill_count.string() << '\n';
+//        std::cout << std::filesystem::exists(image_folder_of_kill_count) << std::endl;
+//        std::cout <<std::filesystem::is_directory(image_folder_of_kill_count)  << std::endl;
         if (std::filesystem::exists(image_folder_of_kill_count) &&
             std::filesystem::is_directory(image_folder_of_kill_count)) {
 //if(true){
@@ -121,14 +126,17 @@ void KillEffectWindow::load_images_from_disk() {
             }
 //            std::sort(files.begin(), files.end());
             for (auto &f: files) {
-                std::cout << f.string() << '\n';
+//                std::cout << f.string() << '\n';
                 images.push_back(std::make_shared<EffectImage>(f.string()));
             }
-            std::cout << images.size() << '\n';
+//            std::cout << images.size() << '\n';
             _image_buffer.push_back(std::make_shared<std::vector<std::shared_ptr<EffectImage>>>(std::move(images)));
         }
+
+        *progress += 1.0f / _max_continuous_kill_count;
     }
-    std::cout << _image_buffer.size() << std::endl;
+//    std::cout << _image_buffer.size() << std::endl;
+    *load_complete = true;
     spdlog::info("loading images to memory succeeded.");
 }
 

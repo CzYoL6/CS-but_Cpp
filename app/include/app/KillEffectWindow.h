@@ -32,7 +32,7 @@ public:
     void AddKillCount_ThreadSafe(int c) ;
     void ShowKillEffect_ThreadSafe();
 private:
-    void load_images_from_disk();
+    void load_images_from_disk(float *progress, bool *load_complete);
     void handle_data(const Json::Value& data);
 public:
     bool hidden() const { return _hidden; }
@@ -61,7 +61,7 @@ private:
 
     httplib::Server _http_server;
     std::thread _http_server_thread;
-
+    std::thread _load_assets_thread;
 };
 
 
