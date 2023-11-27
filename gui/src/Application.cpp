@@ -51,7 +51,56 @@ static void glfw_error_callback(int error, const char* description)
 //           focused ? "focused" : "defocused");
 //}
 namespace GGgui {
+    const char* const logo[] =
+            {
 
+                    "................",
+                    "................",
+                    "...0000..0000...",
+                    "...0.....0......",
+                    "...0.....0000...",
+                    "...0........0...",
+                    "...0000..0000...",
+                    "................",
+                    "................",
+                    "..............0.",
+                    "...0........0...",
+                    "....0.....0.....",
+                    ".....0..0.......",
+                    "......0.........",
+                    "................",
+                    "................"
+            };
+    const unsigned char icon_colors[5][4] =
+            {
+                    {   0,   0,   0, 255 }, // black
+                    { 255,   0,   0, 255 }, // red
+                    {   0, 255,   0, 255 }, // green
+                    {   0,   0, 255, 255 }, // blue
+                    { 255, 255, 255, 255 }  // white
+            };
+    static void set_icon(GLFWwindow* window, int icon_color)
+    {
+        int x, y;
+        unsigned char pixels[16 * 16 * 4];
+        unsigned char* target = pixels;
+        GLFWimage img = { 16, 16, pixels };
+
+        for (y = 0;  y < img.width;  y++)
+        {
+            for (x = 0;  x < img.height;  x++)
+            {
+                if (logo[y][x] == '0')
+                    memcpy(target, icon_colors[icon_color], 4);
+                else
+                    memset(target, 0, 4);
+
+                target += 4;
+            }
+        }
+
+        glfwSetWindowIcon(window, 1, &img);
+    }
     Application::Application(const ApplicationSpecification &specification)
             : m_Specification(specification) {
         s_Instance = this;
@@ -124,6 +173,8 @@ namespace GGgui {
 
         glfwHideWindow(m_WindowHandle);
 //        glfwSetWindowFocusCallback(m_WindowHandle, window_focus_callback);
+
+        set_icon(m_WindowHandle, 3);
 
 
         // Setup Dear ImGui context
