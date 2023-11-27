@@ -15,6 +15,8 @@
 #include <stb_image/stb_image.h>
 #include <spdlog/spdlog.h>
 #include <soloud_wav.h>
+#include <conio.h>
+#include <Windows.h>
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -272,6 +274,7 @@ namespace GGgui {
             // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
             // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
             glfwPollEvents();
+
 
 
 

@@ -18,6 +18,7 @@ void SettingWindow::OnUIRender()
 
     Settings& settings = SettingWindow::GetInstance().settings();
     if(show) {
+//        if(true) {
         ImGui::SetNextWindowSize({600, 0});
         ImGui::Begin("CS but Valorant", nullptr,
                      ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
@@ -34,8 +35,7 @@ void SettingWindow::OnUIRender()
 
             ImGui::SameLine();
             if (ImGui::Button("Test")) {
-                KillEffectWindow::GetInstance().AddContinuousKillCount_ThreadSafe(1);
-                KillEffectWindow::GetInstance().ShowContinuousKillEffect_ThreadSafe();
+                KillEffectWindow::GetInstance().ShowRoundKillEffect(1);
             }
 
             ImGui::SameLine();
@@ -71,16 +71,6 @@ void SettingWindow::OnUIRender()
             //////////////////////////////////////////////////////////////////////////////////////////
             ImGui::Spacing();
             ImGui::Text("Other");
-            ImGui::RadioButton("Continuous Kill", &settings.kill_accumulate_method, 0);
-            ImGui::SameLine();
-            ImGui::RadioButton("Round Total Kill", &settings.kill_accumulate_method, 1);
-            if (settings.kill_accumulate_method == 1)
-                ImGui::BeginDisabled();
-            ImGui::InputFloat("MaxContinuousKillTimeSecondInputFloat", &settings.max_continuous_kill_time_sec, 0.2f,
-                              1.0f,
-                              "%.1f");
-            if (settings.kill_accumulate_method == 1)
-                ImGui::EndDisabled();
             ImGui::Checkbox("ShowEffectWhenSpectatingCheckbox", &settings.show_effect_when_spectating);
             ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -95,18 +85,23 @@ void SettingWindow::OnUIRender()
 //    ImGui::ShowDemoWindow();
 }
 
-void SettingWindow::OnAttach() {
-    Layer::OnAttach();
-    const auto& app = GGgui::Application::Get();
-    glfwSetWindowIconifyCallback(app.window_handle(), [](GLFWwindow* window, int iconified){
-        if(!SettingWindow::GetInstance().show) {
-            SettingWindow::GetInstance().show = true;
-
-//            std::cout << "focused" << '\n';
-        }
-
-    });
+void SettingWindow::OnUpdate(float ts) {
+    Layer::OnUpdate(ts);
 
 }
 
-#include "app/SettingWindow.h"
+void SettingWindow::OnAttach() {
+    Layer::OnAttach();
+    _hotkey_capture_thread = std::thread([this]{
+        RegisterHotKey(NULL, 1, MOD_CONTROL | 0X4000, VK_F12) ; // Ctrl F12
+        MSG msg;
+        while(1) {
+            if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0) {
+                if (msg.wParam == 1) {
+                    std::cout << "hot key" << std::endl;
+                    show = true;
+                }
+            }
+        }
+    });(void)_hotkey_capture_thread;
+}

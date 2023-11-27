@@ -8,6 +8,7 @@
 #include <gui/Application.h>
 #include <json/json.h>
 #include <fstream>
+#include <thread>
 
 struct Settings{
     Settings(){
@@ -20,9 +21,6 @@ struct Settings{
             offset_x = setting["offset_x"].asInt();
             offset_y = setting["offset_y"].asInt();
 
-            kill_accumulate_method = setting["kill_accumulate_method"].asInt();
-            max_continuous_kill_time_sec = setting["max_continuous_kill_time_sec"].asFloat();
-
             show_effect_when_spectating = setting["show_effect_when_spectating"].asBool();
             file.close();
         }
@@ -31,8 +29,6 @@ struct Settings{
                 R"({
                     "offset_x" : 0,
                     "offset_y" : 400,
-                    "kill_accumulate_method" : 0,
-                    "max_continuous_kill_time_sec" : 5.0,
                     "show_effect_when_spectating" : 0
 
                     })";
@@ -48,9 +44,6 @@ struct Settings{
         setting["offset_x"] = offset_x;
         setting["offset_y"] = offset_y;
 
-        setting["kill_accumulate_method"] = kill_accumulate_method;
-        setting["max_continuous_kill_time_sec"] = max_continuous_kill_time_sec;
-
         setting["show_effect_when_spectating"] = show_effect_when_spectating;
         std::filesystem::path setting_file = "./settings.json";
         std::fstream file(setting_file, std::ios_base::out);
@@ -60,10 +53,6 @@ struct Settings{
 
     int offset_x{0};
     int offset_y{400};
-
-
-    int kill_accumulate_method{0};   // 0 continuous kill, 1 round kill
-    float max_continuous_kill_time_sec{5.0f};
 
     bool show_effect_when_spectating{false};
 };
@@ -78,6 +67,7 @@ public:
 private:
     static SettingWindow* _instance;
     Settings _settings;
+    std::thread _hotkey_capture_thread;
 public:
     static SettingWindow& GetInstance() {
         assert(_instance != nullptr);
@@ -86,6 +76,8 @@ public:
 public:
     virtual void OnUIRender() override;
     virtual void OnAttach() override;
+    virtual void OnUpdate(float ts) override;
+
     Settings& settings() {return _settings;}
 public:
     bool show = true;

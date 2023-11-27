@@ -78,28 +78,11 @@ void KillEffectWindow::Show() {
 void KillEffectWindow::OnUpdate(float ts) {
     Layer::OnUpdate(ts);
 //    spdlog::info("timestep: {}s\n", ts);
-    if(_continuous_kill_count > 0){
-        _continuous_kill_timer += ts;
-        if(_continuous_kill_timer >= SettingWindow::GetInstance().settings().max_continuous_kill_time_sec){
-            _continuous_kill_timer = 0;
-            _continuous_kill_count = 0;
-        }
-    }
 
     _image_sequence_player->Update(ts);
 }
 
-void KillEffectWindow::ShowContinuousKillEffect_ThreadSafe() {
-    _continuous_kill_mutex.lock();
 
-    assert(_continuous_kill_count <= _max_continuous_kill_count);
-    _image_sequence_player->ResetImageSequence(_image_buffer[_continuous_kill_count - 1]);
-    auto &app = GGgui::Application::Get();
-    app.PlayAudio(std::format("E:\\Programming\\CS-but_Cpp\\cmake-build-release\\app\\Assets\\audio\\{}kill.wav", _continuous_kill_count));
-
-    _continuous_kill_mutex.unlock();
-    _image_sequence_player->Play();
-}
 
 void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complete) {
     for(int ckc = 1; ckc <= _max_continuous_kill_count; ckc++ ) {
@@ -139,19 +122,6 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
     spdlog::info("loading images to memory succeeded.");
 }
 
-void KillEffectWindow::AddContinuousKillCount_ThreadSafe(int c) {
-
-    _continuous_kill_mutex.lock();
-
-    _continuous_kill_count += c;
-    if(_continuous_kill_count > _max_continuous_kill_count) {
-        _continuous_kill_count = _max_continuous_kill_count;
-    }
-    _continuous_kill_mutex.unlock();
-    _continuous_kill_timer = 0;
-
-
-}
 
 KillEffectWindow::KillEffectWindow() {
     assert(_instance == nullptr);
@@ -178,14 +148,8 @@ void KillEffectWindow::handle_data(const Json::Value &data) {
         int delta_round_kill = cur_player_round_kill - previous_player_round_kill;
 
         if (delta_round_kill > 0) {
-            if(SettingWindow::GetInstance().settings().kill_accumulate_method == 0) {
-                AddContinuousKillCount_ThreadSafe(delta_round_kill);
-                ShowContinuousKillEffect_ThreadSafe();
-            }
-            else if(SettingWindow::GetInstance().settings().kill_accumulate_method == 1) {
-                ShowRoundKillEffect(cur_player_round_kill > _max_continuous_kill_count ?
-                _max_continuous_kill_count : cur_player_round_kill);
-            }
+            ShowRoundKillEffect(cur_player_round_kill > _max_continuous_kill_count ?
+            _max_continuous_kill_count : cur_player_round_kill);
         }
     } while (false);
 
