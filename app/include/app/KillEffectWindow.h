@@ -29,8 +29,9 @@ public:
     virtual void OnAttach() override;
     void Hide() ;
     void Show();
-    void AddKillCount_ThreadSafe(int c) ;
-    void ShowKillEffect_ThreadSafe();
+    void AddContinuousKillCount_ThreadSafe(int c) ;
+    void ShowContinuousKillEffect_ThreadSafe();
+    void ShowRoundKillEffect(int round_kill);
 private:
     void load_images_from_disk(float *progress, bool *load_complete);
     void handle_data(const Json::Value& data);

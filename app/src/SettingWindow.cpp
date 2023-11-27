@@ -34,8 +34,8 @@ void SettingWindow::OnUIRender()
 
             ImGui::SameLine();
             if (ImGui::Button("Test")) {
-                KillEffectWindow::GetInstance().AddKillCount_ThreadSafe(1);
-                KillEffectWindow::GetInstance().ShowKillEffect_ThreadSafe();
+                KillEffectWindow::GetInstance().AddContinuousKillCount_ThreadSafe(1);
+                KillEffectWindow::GetInstance().ShowContinuousKillEffect_ThreadSafe();
             }
 
             ImGui::SameLine();
@@ -99,7 +99,7 @@ void SettingWindow::OnAttach() {
     Layer::OnAttach();
     const auto& app = GGgui::Application::Get();
     glfwSetWindowIconifyCallback(app.window_handle(), [](GLFWwindow* window, int iconified){
-        if(!iconified && !SettingWindow::GetInstance().show) {
+        if(!SettingWindow::GetInstance().show) {
             SettingWindow::GetInstance().show = true;
 
 //            std::cout << "focused" << '\n';

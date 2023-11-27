@@ -89,11 +89,10 @@ void KillEffectWindow::OnUpdate(float ts) {
     _image_sequence_player->Update(ts);
 }
 
-void KillEffectWindow::ShowKillEffect_ThreadSafe() {
+void KillEffectWindow::ShowContinuousKillEffect_ThreadSafe() {
     _continuous_kill_mutex.lock();
 
     assert(_continuous_kill_count <= _max_continuous_kill_count);
-    std::cout << _continuous_kill_count << '\n';
     _image_sequence_player->ResetImageSequence(_image_buffer[_continuous_kill_count - 1]);
     auto &app = GGgui::Application::Get();
     app.PlayAudio(std::format("E:\\Programming\\CS-but_Cpp\\cmake-build-release\\app\\Assets\\audio\\{}kill.wav", _continuous_kill_count));
@@ -140,7 +139,7 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
     spdlog::info("loading images to memory succeeded.");
 }
 
-void KillEffectWindow::AddKillCount_ThreadSafe(int c) {
+void KillEffectWindow::AddContinuousKillCount_ThreadSafe(int c) {
 
     _continuous_kill_mutex.lock();
 
@@ -165,25 +164,38 @@ KillEffectWindow::KillEffectWindow() {
 
 void KillEffectWindow::handle_data(const Json::Value &data) {
     do {
-        if(data.empty() || data["player"].empty() || data["player"]["steamid"].empty()) break;
+        if (data["player"]["steamid"].empty()) break;
         std::string steamid = data["player"]["steamid"].asString();
         if (steamid != "76561198863164733") {
-            return;
+            break;
         }
-
-        if(data["player"]["state"].empty() || data["player"]["state"]["round_kills"].empty()) break;
+        if (data["player"]["state"]["round_kills"].empty()) break;
         int cur_player_round_kill = data["player"]["state"]["round_kills"].asInt();
 
-        if(data["previously"].empty() || data["previously"]["player"].empty() || data["previously"]["player"]["state"].empty() || data["previously"]["player"]["state"]["round_kills"].empty()) break;
+        if (data["previously"]["player"]["state"]["round_kills"].empty()) break;
         int previous_player_round_kill = data["previously"]["player"]["state"]["round_kills"].asInt();
 
         int delta_round_kill = cur_player_round_kill - previous_player_round_kill;
 
         if (delta_round_kill > 0) {
-
-            AddKillCount_ThreadSafe(delta_round_kill);
-            ShowKillEffect_ThreadSafe();
+            if(SettingWindow::GetInstance().settings().kill_accumulate_method == 0) {
+                AddContinuousKillCount_ThreadSafe(delta_round_kill);
+                ShowContinuousKillEffect_ThreadSafe();
+            }
+            else if(SettingWindow::GetInstance().settings().kill_accumulate_method == 1) {
+                ShowRoundKillEffect(cur_player_round_kill > _max_continuous_kill_count ?
+                _max_continuous_kill_count : cur_player_round_kill);
+            }
         }
-    }while(false);
+    } while (false);
 
+}
+
+void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
+    assert(_continuous_kill_count <= _max_continuous_kill_count);
+    _image_sequence_player->ResetImageSequence(_image_buffer[round_kill - 1]);
+    auto &app = GGgui::Application::Get();
+    app.PlayAudio(std::format("E:\\Programming\\CS-but_Cpp\\cmake-build-release\\app\\Assets\\audio\\{}kill.wav", round_kill));
+
+    _image_sequence_player->Play();
 }
