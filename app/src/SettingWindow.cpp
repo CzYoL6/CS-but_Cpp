@@ -98,7 +98,7 @@ void SettingWindow::OnAttach() {
         while(1) {
             if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0) {
                 if (msg.wParam == 1) {
-                    std::cout << "hot key" << std::endl;
+//                    std::cout << "hot key" << std::endl;
                     show = true;
                 }
             }
