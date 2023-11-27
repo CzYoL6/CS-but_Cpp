@@ -16,7 +16,7 @@ void SettingWindow::OnUIRender()
 //    std::cout << GGgui::Input::IsKeyDown(GGgui::KeyCode::A) << '\n';
 //    if(ImGui::IsKeyDown(GLFW_KEY_F6)) show = !show;
 
-    Settings& settings = Settings::Get();
+    Settings& settings = SettingWindow::GetInstance().settings();
 
     if(show) {
         ImGui::SetNextWindowSize({600, 0});

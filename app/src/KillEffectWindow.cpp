@@ -24,7 +24,7 @@ void KillEffectWindow::OnUIRender() {
 
         ImGui::Begin("Kill Effect Window", nullptr, window_flags);
         if(_frame_buffer->gl_texture_id() != 0 && _image_sequence_player->playing()){
-            Settings& settings = Settings::Get();
+            Settings& settings = SettingWindow::GetInstance().settings();
             float factor =  ImGui::GetWindowWidth() / 3840.0f;
             ImGui::SetCursorPos({ImGui::GetWindowWidth()*0.5f +  - factor*_frame_buffer->image_width()*0.5f + settings.offset_x, ImGui::GetWindowHeight()*0.5f - factor*_frame_buffer->image_height() + settings.offset_y});
 //            std::cout <<ImGui::GetWindowWidth()*0.5f +  - factor*_frame_buffer->image_width()*0.5f + offset_x<<","<<ImGui::GetWindowHeight()*0.5f - factor*_frame_buffer->image_height()*0.5f + offset_y<<'\n';
@@ -80,7 +80,7 @@ void KillEffectWindow::OnUpdate(float ts) {
 //    spdlog::info("timestep: {}s\n", ts);
     if(_continuous_kill_count > 0){
         _continuous_kill_timer += ts;
-        if(_continuous_kill_timer >= Settings::Get().max_continuous_kill_time_sec){
+        if(_continuous_kill_timer >= SettingWindow::GetInstance().settings().max_continuous_kill_time_sec){
             _continuous_kill_timer = 0;
             _continuous_kill_count = 0;
         }
