@@ -466,7 +466,7 @@ template <typename Char> class basic_string_view {
   template <typename S, FMT_ENABLE_IF(std::is_same<
                                       S, detail::std_string_view<Char>>::value)>
   FMT_CONSTEXPR basic_string_view(S s) noexcept
-      : data_(s.data()), size_(s.size()) {}
+      : data_(s._data()), size_(s.size()) {}
 
   /** Returns a pointer to the string data. */
   constexpr auto data() const noexcept -> const Char* { return data_; }

@@ -9,6 +9,8 @@
 #include <gui/Application.h>
 #include <app/ImageSequencePlayer.h>
 #include <filesystem>
+#include <httplib.h>
+#include <json/json.h>
 
 
 class KillEffectWindow : public GGgui::Layer{
@@ -27,10 +29,11 @@ public:
     virtual void OnAttach() override;
     void Hide() ;
     void Show();
-    void AddKillCount(int c) ;
-    void ShowKillEffect();
+    void AddKillCount_ThreadSafe(int c) ;
+    void ShowKillEffect_ThreadSafe();
 private:
     void load_images_from_disk();
+    void handle_data(const Json::Value& data);
 public:
     bool hidden() const { return _hidden; }
     int continuous_kill_count() const { return _continuous_kill_count;}
@@ -45,6 +48,7 @@ private:
     int _max_continuous_kill_count{5};
     float _max_continuous_kill_time{5};
     float _continuous_kill_timer{0};
+    std::mutex _continuous_kill_mutex;
 
     std::filesystem::path _image_folder_path{"./Assets/banner/"};        // where kill banners are stored
                                                                   // the folder structure must be
@@ -57,7 +61,8 @@ private:
                                                                   //    - ...
                                                                   // default is at "./Assets/banner/"
 
-
+    httplib::Server _http_server;
+    std::thread _http_server_thread;
 };
 
 

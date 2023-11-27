@@ -12,7 +12,6 @@
 #include <soloud.h>
 #include <filesystem>
 #include <soloud_wav.h>
-#include <httplib.h>
 
 //#define CPPHTTPLIB_OPENSSL_SUPPORT
 
@@ -22,7 +21,7 @@ namespace GGgui {
 
     struct ApplicationSpecification
     {
-        std::string Name = "GGgui App";
+        std::string Name = "CS but ...";
         uint32_t Width = 1600;
         uint32_t Height = 900;
     };
@@ -53,7 +52,7 @@ namespace GGgui {
         float GetSmoothedFps(){return m_SmoothedFps;}
         GLFWwindow* GetWindowHandle() const { return m_WindowHandle; }
 
-        void PlaySound(std::string_view  audio_path);
+        void PlayAudio(std::string_view  audio_path);
 
     private:
         void Init();
@@ -76,10 +75,7 @@ namespace GGgui {
         SoLoud::Soloud _soloud_core;
         std::queue<std::shared_ptr<SoLoud::Wav>> _wav_ass;
 
-        httplib::Server _http_server;
-        std::thread _http_server_thread;
-        std::mutex data_mutex;
-        bool data = false;
+
 
     };
 

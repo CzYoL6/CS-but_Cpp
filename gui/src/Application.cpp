@@ -63,25 +63,6 @@ namespace GGgui {
             _wav_ass.emplace(std::make_shared<SoLoud::Wav>());
         }
 
-        _http_server.Post("/", [this](const httplib::Request &req, httplib::Response &res) {
-            std::cout << req.body << std::endl;
-//                PlaySound("1kill.wav");
-            data_mutex.lock();
-            data=true;
-            data_mutex.unlock();
-            res.set_content("", "text/html");
-            res.set_header("Content-Type", "text/html" );
-            res.status=200;
-        });
-
-        _http_server_thread = std::thread([&]{
-            spdlog::warn("http server launched.");
-           _http_server.listen("127.0.0.1", 3003);
-        });
-
-        (void)_http_server_thread;
-
-
         // Setup window
         glfwSetErrorCallback(glfw_error_callback);
         if (!glfwInit()) {
@@ -225,11 +206,11 @@ namespace GGgui {
 
             // To set mouse paththrough, we need to set viewport flags, or set glfw hint here, cuz ImGui_ImplGlfw_NewFrame()
             // override that hint.
-            ImGuiViewport* viewport = ImGui::GetMainViewport();
+            ImGuiViewport *viewport = ImGui::GetMainViewport();
             viewport->Flags |= ImGuiViewportFlags_NoInputs;
 
             // Render custom UI
-            for (auto& layer : m_LayerStack)
+            for (auto &layer: m_LayerStack)
                 layer->OnUpdate(m_TimeStep);
 
             {
@@ -274,16 +255,14 @@ namespace GGgui {
 //                    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 //                }
 
-                if (m_MenubarCallback)
-                {
-                    if (ImGui::BeginMenuBar())
-                    {
+                if (m_MenubarCallback) {
+                    if (ImGui::BeginMenuBar()) {
                         m_MenubarCallback();
                         ImGui::EndMenuBar();
                     }
                 }
 
-                for (auto& layer : m_LayerStack)
+                for (auto &layer: m_LayerStack)
                     layer->OnUIRender();
 
 //                ImGui::End();
@@ -296,7 +275,7 @@ namespace GGgui {
             glfwGetFramebufferSize(m_WindowHandle, &display_w, &display_h);
             glViewport(0, 0, display_w, display_h);
 //            glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-            glClearColor(0,0,0,0);
+            glClearColor(0, 0, 0, 0);
             glClear(GL_COLOR_BUFFER_BIT);
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -319,17 +298,7 @@ namespace GGgui {
             m_TimeStep = glm::min<float>(m_FrameTime, 0.0333f);
             m_LastFrameTime = time;
             m_SmoothedFrameTime = smooth_ratio * m_SmoothedFrameTime + (1 - smooth_ratio) * m_FrameTime;
-            m_SmoothedFps = (uint32_t)(1.0f / m_SmoothedFrameTime);
-
-
-
-
-            data_mutex.lock();
-            if(data){
-                PlaySound("1kill.wav");
-                data = false;
-            }
-            data_mutex.unlock();
+            m_SmoothedFps = (uint32_t) (1.0f / m_SmoothedFrameTime);
 
         }
 
@@ -344,7 +313,7 @@ namespace GGgui {
         return (float) glfwGetTime();
     }
 
-    void Application::PlaySound(std::string_view audio_path) {
+    void Application::PlayAudio(std::string_view audio_path) {
         auto as = _wav_ass.front();
         _wav_ass.pop();
         _wav_ass.push(as);

@@ -19,8 +19,8 @@ void SettingWindow::OnUIRender()
     }
 
     if(ImGui::Button("Kill")){
-        KillEffectWindow::GetInstance().AddKillCount(1);
-        KillEffectWindow::GetInstance().ShowKillEffect();
+        KillEffectWindow::GetInstance().AddKillCount_ThreadSafe(1);
+        KillEffectWindow::GetInstance().ShowKillEffect_ThreadSafe();
     }
 
     ImGui::End();

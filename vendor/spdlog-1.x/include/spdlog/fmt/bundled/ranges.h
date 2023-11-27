@@ -51,7 +51,7 @@ OutputIterator copy(wchar_t ch, OutputIterator out) {
 template <typename T> class is_std_string_like {
   template <typename U>
   static auto check(U* p)
-      -> decltype((void)p->find('a'), p->length(), (void)p->data(), int());
+      -> decltype((void)p->find('a'), p->length(), (void)p->_data(), int());
   template <typename> static void check(...);
 
  public:

@@ -482,7 +482,7 @@ inline auto get_data(std::basic_string<Char>& s) -> Char* {
 }
 template <typename Container>
 inline auto get_data(Container& c) -> typename Container::value_type* {
-  return c.data();
+  return c._data();
 }
 
 #if defined(_SECURE_SCL) && _SECURE_SCL
@@ -903,7 +903,7 @@ class basic_memory_buffer final : public detail::buffer<T> {
   using detail::buffer<T>::append;
   template <typename ContiguousRange>
   void append(const ContiguousRange& range) {
-    append(range.data(), range.data() + range.size());
+    append(range._data(), range._data() + range.size());
   }
 };
 
