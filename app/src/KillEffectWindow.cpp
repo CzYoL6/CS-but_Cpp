@@ -55,13 +55,13 @@ void KillEffectWindow::OnAttach() {
     _http_server_thread = std::thread([&]{
         spdlog::warn("http server launched.");
         _http_server.listen("127.0.0.1", 3003);
-    });
+    }); (void )_http_server_thread;
 
 
     _load_assets_thread = std::thread([this](){
         load_images_from_disk(&SettingWindow::GetInstance().assets_load_progress,
                               &SettingWindow::GetInstance().load_complete);
-    });
+    });(void)_load_assets_thread;
 
 
 //    AddKillCount(1);
@@ -164,10 +164,17 @@ void KillEffectWindow::handle_data(const Json::Value &data) {
 }
 
 void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
-    assert(_continuous_kill_count <= _max_continuous_kill_count);
+    assert(round_kill <= _max_continuous_kill_count);
     _image_sequence_player->ResetImageSequence(_image_buffer[round_kill - 1]);
     auto &app = GGgui::Application::Get();
     app.PlayAudio(std::format("E:\\Programming\\CS-but_Cpp\\cmake-build-release\\app\\Assets\\audio\\{}kill.wav", round_kill));
 
     _image_sequence_player->Play();
+}
+
+void KillEffectWindow::OnDetach() {
+    Layer::OnDetach();
+    _http_server.stop();
+    if(_http_server_thread.joinable()) _http_server_thread.join();
+    if(_load_assets_thread.joinable()) _load_assets_thread.join();
 }

@@ -9,6 +9,7 @@
 #include <json/json.h>
 #include <fstream>
 #include <thread>
+#include <spdlog/spdlog.h>
 
 struct Settings{
     Settings(){
@@ -24,20 +25,21 @@ struct Settings{
             only_show_effect_when_im_playing = setting["only_show_effect_when_im_playing"].asBool();
             steamid = setting["steamid"].asString();
             file.close();
+            spdlog::warn("Settings loaded.");
         }
         else{
-            setting =
-                R"({
+            Json::Reader reader;
+            reader.parse(R"({
                     "offset_x" : 0,
                     "offset_y" : 400,
-                    "only_show_effect_when_im_playing" : 0
-                    "steamid" : 0
-                    })";
+                    "only_show_effect_when_im_playing" : false,
+                    "steamid" : ""
+                    })", setting);
             std::ofstream file(setting_file );
             file << setting;
             file.close();
+            spdlog::warn("No settings file found, new one created.");
         }
-
     }
 
     ~Settings(){
@@ -47,10 +49,11 @@ struct Settings{
 
         setting["only_show_effect_when_im_playing"] = only_show_effect_when_im_playing;
         setting["steamid"] = steamid;
-        std::filesystem::path setting_file = "./settings.json";
-        std::fstream file(setting_file, std::ios_base::out);
+        std::filesystem::path setting_file = "settings.json";
+        std::ofstream file(setting_file);
         file << setting;
         file.close();
+        spdlog::warn("Settings saved.");
     }
 
     int offset_x{0};
@@ -79,6 +82,7 @@ public:
 public:
     virtual void OnUIRender() override;
     virtual void OnAttach() override;
+    virtual void OnDetach() override;
     virtual void OnUpdate(float ts) override;
 
     Settings& settings() {return _settings;}

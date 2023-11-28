@@ -27,6 +27,7 @@ public:
     virtual void OnUIRender() override;
     virtual void OnUpdate(float ts) override;
     virtual void OnAttach() override;
+    virtual void OnDetach() override;
     void Hide() ;
     void Show();
     void ShowRoundKillEffect(int round_kill);

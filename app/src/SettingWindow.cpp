@@ -29,7 +29,7 @@ void SettingWindow::OnUIRender()
             static bool once = false;
             if (!once) {
                 KillEffectWindow::GetInstance().Show();
-                glfwShowWindow(app.window_handle());
+                glfwShowWindow(app.GetWindowHandle());
                 once = true;
             }
 
@@ -105,7 +105,8 @@ void SettingWindow::OnAttach() {
     _hotkey_capture_thread = std::thread([this]{
         RegisterHotKey(NULL, 1, MOD_CONTROL | 0X4000, VK_F12) ; // Ctrl F12
         MSG msg;
-        while(1) {
+        auto& app = GGgui::Application::Get();
+        while(app.IsRunning()) {
             if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0) {
                 if (msg.wParam == 1) {
 //                    std::cout << "hot key" << std::endl;
@@ -114,4 +115,9 @@ void SettingWindow::OnAttach() {
             }
         }
     });(void)_hotkey_capture_thread;
+}
+
+void SettingWindow::OnDetach() {
+    Layer::OnDetach();
+    if(_hotkey_capture_thread.joinable()) _hotkey_capture_thread.join();
 }
