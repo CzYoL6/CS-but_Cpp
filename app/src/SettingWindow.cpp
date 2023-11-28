@@ -78,6 +78,10 @@ void SettingWindow::OnUIRender()
             settings.steamid = steamid;
             if(!settings.only_show_effect_when_im_playing)
                 ImGui::EndDisabled();
+
+            //TODO: add volume control
+
+            //TODO: add size setting
             ////////////////////////////////////////////////////////////////////////////////////////////
 
 
