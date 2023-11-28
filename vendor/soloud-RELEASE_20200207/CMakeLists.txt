@@ -10,12 +10,9 @@ file(GLOB_RECURSE srcs CONFIGURE_DEPENDS
         src/core/*.c
         src/filter/*.cpp
         src/filter/*.c
-        src/tools/*.cpp
-        src/tools/*.c
         include/*.h
 )
 add_library(soloud STATIC ${srcs})
-set_target_properties(soloud PROPERTIES LINKER_LANGUAGE CXX)
 #target_link_libraries(soloud PUBLIC stb)
 target_include_directories(soloud PUBLIC include)
 #target_include_directories(app PUBLIC ${CMAKE_SOURCE_DIR}/vendor/boost)

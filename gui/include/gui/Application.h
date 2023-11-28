@@ -51,10 +51,8 @@ namespace GGgui {
         float GetTime();
         float GetSmoothedFps(){return m_SmoothedFps;}
         GLFWwindow* GetWindowHandle() const { return m_WindowHandle; }
-
+        bool IsRunning() const { return m_Running; }
         void PlayAudio(std::string_view  audio_path);
-    public:
-        GLFWwindow* window_handle() const{return m_WindowHandle;}
     private:
         void Init();
         void Shutdown();
