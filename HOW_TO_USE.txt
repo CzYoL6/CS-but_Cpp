@@ -5,7 +5,7 @@ Steps:
     2.Copy and paste gamestate_integration_cs2.cfg into the folder above.
 
     3.Launch CS-but.exe, this will start to load all the assets. Currently all the assets will be loaded into memory and it
-    will take more than 3GB, so please make sure you have enough memory.
+    will take more than 3GB, so please make sure you have enough memory(this will be improved in the future).
 
     4.You can test, or change all the settings once the loading is done. Show/Hide of the settings window by Ctrl+F12.
 
