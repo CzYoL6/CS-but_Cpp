@@ -53,7 +53,7 @@ void KillEffectWindow::OnAttach() {
         res.status=200;
     });
     _http_server_thread = std::thread([&]{
-        spdlog::warn("http server launched.");
+        spdlog::warn("http server launched on port 3003.");
         _http_server.listen("127.0.0.1", 3003);
     }); (void )_http_server_thread;
 
@@ -93,7 +93,7 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
 //        std::filesystem::path tmp = std::format("{}kill", ckc);
 //        std::filesystem::path image_folder_of_kill_count = _image_folder_path / tmp;
 //        std::filesystem::path image_folder_of_kill_count = std::format("E:\\Programming\\CS-but_Cpp\\cmake-build-release\\app\\Assets\\banner\\{}kill\\", ckc);
-        std::filesystem::path image_folder_of_kill_count = std::format("E:\\AdobeWorks\\Valorant\\cropped\\{}kill\\", ckc);
+        std::filesystem::path image_folder_of_kill_count = std::format("assets\\banner\\{}kill\\", ckc);
 //        std::cout << image_folder_of_kill_count.string() << '\n';
 //        std::cout << std::filesystem::exists(image_folder_of_kill_count) << std::endl;
 //        std::cout <<std::filesystem::is_directory(image_folder_of_kill_count)  << std::endl;
@@ -120,7 +120,7 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
     }
 //    std::cout << _image_buffer.size() << std::endl;
     *load_complete = true;
-    spdlog::info("loading images to memory succeeded.");
+    spdlog::warn("loading images to memory succeeded.");
 }
 
 
@@ -167,7 +167,7 @@ void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
     assert(round_kill <= _max_continuous_kill_count);
     _image_sequence_player->ResetImageSequence(_image_buffer[round_kill - 1]);
     auto &app = GGgui::Application::Get();
-    app.PlayAudio(std::format("E:\\Programming\\CS-but_Cpp\\cmake-build-release\\app\\Assets\\audio\\{}kill.wav", round_kill));
+    app.PlayAudio(std::format("assets\\audio\\{}kill.wav", round_kill));
 
     _image_sequence_player->Play();
 }
