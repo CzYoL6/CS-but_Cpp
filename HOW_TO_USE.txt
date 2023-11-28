@@ -9,4 +9,7 @@ Steps:
 
     4.You can test, or change all the settings once the loading is done. Show/Hide of the settings window by Ctrl+F12.
 
-    5.Launch CS2, set the game to run in full-screen window mode, and enjoy the game.
+    5.Launch CS2, set the game to run in full-screen window mode. If you wanna play with aspect ratio of 4:3, you probably need
+    to set your system resolution first and then run the game in full-screen window mode.
+
+    6.Enjoy the game!
