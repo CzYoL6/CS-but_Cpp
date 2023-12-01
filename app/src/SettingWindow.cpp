@@ -4,6 +4,7 @@
 #include <app/SettingWindow.h>
 #include <app/KillEffectWindow.h>
 #include<Input/Input.h>
+#include <spdlog/spdlog.h>
 
 SettingWindow* SettingWindow::_instance = nullptr;
 
@@ -52,17 +53,24 @@ void SettingWindow::OnUIRender()
             ImGui::Separator();
             ////////////////////////////////////////////////////////////////////////////////////////
             ImGui::Spacing();
-            ImGui::Text("Effect");
+            ImGui::Text("Offset");
             ImGui::DragInt("Offset X", &settings.offset_x);
             ImGui::DragInt("Offset Y", &settings.offset_y);
 
-//            ImGui::Text("Asset Quality");
-//            ImGui::RadioButton("Medium", &settings.asset_quality, 0);
-//            ImGui::SameLine();
-//            ImGui::RadioButton("High", &settings.asset_quality, 1);
-//
-//            const char *framerates[] = {"60fps", "120fps"};
-//            ImGui::Combo("FramerateCombo", &settings.high_framerate, framerates, IM_ARRAYSIZE(framerates));
+            ImGui::Separator();
+
+            ImGui::Text("Asset Quality");
+            ImGui::RadioButton("Medium", &settings.asset_quality, 0);
+            ImGui::SameLine();
+            ImGui::RadioButton("High", &settings.asset_quality, 1);
+
+            ImGui::Separator();
+            const char *framerates[] = {"60fps", "120fps"};
+            ImGui::Combo("Framerate", &settings.framerate, framerates, IM_ARRAYSIZE(framerates));
+            if(ImGui::Button("Reload Assets")){
+                spdlog::warn("Reloading Assets");
+                KillEffectWindow::GetInstance().LoadAssets();
+            }
 
 
             //////////////////////////////////////////////////////////////////////////////////////////

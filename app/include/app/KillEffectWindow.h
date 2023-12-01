@@ -31,6 +31,7 @@ public:
     void Hide() ;
     void Show();
     void ShowRoundKillEffect(int round_kill);
+    void LoadAssets();
 private:
     void load_images_from_disk(float *progress, bool *load_complete);
     void handle_data(const Json::Value& data);

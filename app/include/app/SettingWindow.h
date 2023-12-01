@@ -21,7 +21,8 @@ struct Settings{
 
             offset_x = setting["offset_x"].asInt();
             offset_y = setting["offset_y"].asInt();
-
+            asset_quality = setting["asset_quality"].asInt();
+            framerate = setting["framerate"].asInt();
             only_show_effect_when_im_playing = setting["only_show_effect_when_im_playing"].asBool();
             steamid = setting["steamid"].asString();
             file.close();
@@ -32,6 +33,8 @@ struct Settings{
             reader.parse(R"({
                     "offset_x" : 0,
                     "offset_y" : 400,
+                    "asset_quality" : 0,
+                    "framerate" : 0,
                     "only_show_effect_when_im_playing" : false,
                     "steamid" : ""
                     })", setting);
@@ -46,7 +49,8 @@ struct Settings{
         Json::Value setting;
         setting["offset_x"] = offset_x;
         setting["offset_y"] = offset_y;
-
+        setting["asset_quality"] = asset_quality;
+        setting["framerate"] = framerate;
         setting["only_show_effect_when_im_playing"] = only_show_effect_when_im_playing;
         setting["steamid"] = steamid;
         std::filesystem::path setting_file = "settings.json";
@@ -58,6 +62,8 @@ struct Settings{
 
     int offset_x{0};
     int offset_y{400};
+    int asset_quality{0};   //0 medium, 1 high
+    int framerate{0};   //0 60fps, 1 120fps
 
     bool only_show_effect_when_im_playing{false};
     std::string steamid;

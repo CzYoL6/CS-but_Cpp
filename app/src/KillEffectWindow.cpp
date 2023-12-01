@@ -58,10 +58,7 @@ void KillEffectWindow::OnAttach() {
     }); (void )_http_server_thread;
 
 
-    _load_assets_thread = std::thread([this](){
-        load_images_from_disk(&SettingWindow::GetInstance().assets_load_progress,
-                              &SettingWindow::GetInstance().load_complete);
-    });(void)_load_assets_thread;
+    LoadAssets();
 
 
 //    AddKillCount(1);
@@ -177,4 +174,16 @@ void KillEffectWindow::OnDetach() {
     _http_server.stop();
     if(_http_server_thread.joinable()) _http_server_thread.join();
     if(_load_assets_thread.joinable()) _load_assets_thread.join();
+}
+
+void KillEffectWindow::LoadAssets() {
+    _image_sequence_player->Stop();
+    _image_buffer.clear();
+    SettingWindow::GetInstance().assets_load_progress = 0.0f;
+    SettingWindow::GetInstance().load_complete = false;
+    if(_load_assets_thread.joinable()) _load_assets_thread.join();
+    _load_assets_thread = std::thread([this](){
+        load_images_from_disk(&SettingWindow::GetInstance().assets_load_progress,
+                              &SettingWindow::GetInstance().load_complete);
+    });(void)_load_assets_thread;
 }
