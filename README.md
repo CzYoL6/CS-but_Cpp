@@ -28,9 +28,9 @@ will come in the future(by change loading method or by loading the texture into 
 
 - [ ] add size control.
 
-- [ ] improve memory consumption.
+- [x] improve memory consumption.
 
-- [ ] offer more quality level.
+- [x] offer more quality level.
 
 - [ ] add more effects of different games.
 
