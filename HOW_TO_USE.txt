@@ -14,6 +14,8 @@ Steps:
 
     6.Enjoy the game!
 
+    (This program will theoretically never cause VAC)
+
 步骤:
     1.打开CS2配置文件夹（.../steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg）
 
@@ -26,3 +28,5 @@ Steps:
     5.启动CS2，将游戏设置为"全屏窗口模式"。如果您想使用4:3的宽高比玩游戏，您可能需要首先设置系统分辨率，然后以"全屏窗口模式"运行游戏。
 
     6.尽情享受游戏！
+
+    (这个程序理论上不会引起VAC)
