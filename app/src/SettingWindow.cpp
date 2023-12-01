@@ -73,7 +73,6 @@ void SettingWindow::OnUIRender()
             ImGui::SameLine();
             ImGui::RadioButton("High", &settings.asset_quality, 1);
 
-            ImGui::Separator();
             const char *framerates[] = {"60fps", "120fps"};
             ImGui::Combo("Framerate", &settings.framerate, framerates, IM_ARRAYSIZE(framerates));
             if(ImGui::Button("Reload Assets")){
