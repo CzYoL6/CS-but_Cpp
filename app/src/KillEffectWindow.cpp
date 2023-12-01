@@ -10,6 +10,8 @@
 #include <gui/Application.h>
 #include <app/SettingWindow.h>
 #include <map>
+#include <windows.h>
+#include <psapi.h>
 
 KillEffectWindow* KillEffectWindow::_instance = nullptr;
 
@@ -192,3 +194,4 @@ void KillEffectWindow::LoadAssets() {
                               SettingWindow::GetInstance().settings().asset_quality);
     });(void)_load_assets_thread;
 }
+

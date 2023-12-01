@@ -5,6 +5,8 @@
 #include <app/KillEffectWindow.h>
 #include<Input/Input.h>
 #include <spdlog/spdlog.h>
+#include <windows.h>
+#include <psapi.h>
 
 SettingWindow* SettingWindow::_instance = nullptr;
 
@@ -51,6 +53,13 @@ void SettingWindow::OnUIRender()
             ImGui::SameLine();
             ImGui::Text("Use Ctrl+F12 to show and hide this window.");
             ImGui::Separator();
+
+            ImGui::Text("Memory consumption");
+            auto mem = get_memory_consumption();
+            ImGui::Text("Virtual Memory: %d MB", mem.first);
+            ImGui::Text("Physical Memory: %d MB", mem.second);
+
+            ImGui::Separator();
             ////////////////////////////////////////////////////////////////////////////////////////
             ImGui::Spacing();
             ImGui::Text("Offset");
@@ -74,7 +83,7 @@ void SettingWindow::OnUIRender()
 
 
             //////////////////////////////////////////////////////////////////////////////////////////
-            ImGui::Spacing();
+            ImGui::Separator();
             ImGui::Text("Other");
             ImGui::Checkbox("Only show effect when I'm playing(disable when spectating)", &settings.only_show_effect_when_im_playing);
             if(!settings.only_show_effect_when_im_playing)
@@ -128,4 +137,15 @@ void SettingWindow::OnAttach() {
 void SettingWindow::OnDetach() {
     Layer::OnDetach();
     if(_hotkey_capture_thread.joinable()) _hotkey_capture_thread.join();
+}
+
+std::pair<int, int> SettingWindow::get_memory_consumption(){
+    static HANDLE process = GetCurrentProcess();
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+    if (GetProcessMemoryInfo(process, reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc), sizeof(pmc))) {
+        return {pmc.PrivateUsage / (1024 * 1024), pmc.WorkingSetSize / (1024 * 1024)  };
+    } else {
+        spdlog::error("Error getting process memory information. Error code: {}",GetLastError() );
+        exit(-1);
+    }
 }

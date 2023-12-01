@@ -80,6 +80,7 @@ private:
     static SettingWindow* _instance;
     Settings _settings;
     std::thread _hotkey_capture_thread;
+    static std::pair<int, int> get_memory_consumption(); // <virtual mem, physical mem> MB
 public:
     static SettingWindow& GetInstance() {
         assert(_instance != nullptr);
