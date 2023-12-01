@@ -20,7 +20,7 @@ The program is composed of three parts:
 
 As you can see, the program is non-invasive, and will never cause VAC.
 
-Currently, all the assets(120fps) will be loaded into memory, which will ocupy more than 3GB. Memory consumption improvements
+Currently, all the assets(2k120fps/2k60fps/1080p120fps/1080p60fps) will be loaded into memory, which will ocupy larger memory as the assets quality and frames get higher. Memory consumption improvements
 will come in the future(by change loading method or by loading the texture into GPU).
 
 ## To Do
