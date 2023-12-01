@@ -1,11 +1,12 @@
+v1.1
+
 Steps:
 
     1.Open CS2 configuration folder(..../steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg)
 
     2.Copy and paste gamestate_integration_cs2.cfg into the folder above.
 
-    3.Launch CS-but.exe, this will start to load all the assets. Currently all the assets will be loaded into memory and it
-    will take more than 3GB, so please make sure you have enough memory(this will be improved in the future).
+    3.Launch CS-but.exe, this will start to load all the assets. Currently all the assets will be loaded into memory, higher quality and framerate comes with larger memory consumption, so please make sure you have enough memory(this will be improved in the future).
 
     4.You can test, or change all the settings once the loading is done. Show/Hide of the settings window by Ctrl+F12.
 
@@ -14,7 +15,8 @@ Steps:
 
     6.Enjoy the game!
 
-    (This program will theoretically never cause VAC)
+    This program will theoretically never cause VAC. If you are interested, you can also have a look at the github repository:https://github.com/CzYoL6/CS-but_Cpp.
+
 
 步骤:
     1.打开CS2配置文件夹（.../steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg）
@@ -29,4 +31,7 @@ Steps:
 
     6.尽情享受游戏！
 
-    (这个程序理论上不会引起VAC)
+    这个程序理论上不会引起VAC, 如果你有兴趣的话，也可以看看Github仓库：https://github.com/CzYoL6/CS-but_Cpp。
+
+
+

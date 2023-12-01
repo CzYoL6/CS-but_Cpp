@@ -10,6 +10,5 @@ target_link_libraries(GGgui PUBLIC soloud)
 target_link_libraries(GGgui PUBLIC httplib)
 target_link_libraries(GGgui PUBLIC glu32)
 
-set_target_properties(GGgui PROPERTIES WIN32_EXECUTABLE true)
 
 target_include_directories(GGgui PUBLIC include)
