@@ -40,12 +40,12 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-//void get_resolution(int &window_width, int &window_height) {
-//    const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-//
-//    window_width = mode->width;
-//    window_height = mode->height;
-//}
+void get_resolution(int &window_width, int &window_height) {
+    const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+    window_width = mode->width;
+    window_height = mode->height;
+}
 //static void window_focus_callback(GLFWwindow* window, int focused)
 //{
 //    printf("%0.2f Window %s\n",
@@ -158,7 +158,7 @@ namespace GGgui {
 #endif
         glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
         glfwWindowHint(GLFW_FLOATING, 1);
-        glfwWindowHint(GLFW_MAXIMIZED, 1);
+//        glfwWindowHint(GLFW_MAXIMIZED, 1);
         glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 //        glfwWindowHint(GLFW_MOUSE_PASSTHROUGH, GLFW_TRUE);
 
@@ -171,9 +171,9 @@ namespace GGgui {
             return;
         }
         glfwMakeContextCurrent(m_WindowHandle);
-        glfwSwapInterval(0);
+        glfwSwapInterval(1);
 
-        glfwHideWindow(m_WindowHandle);
+//        glfwHideWindow(m_WindowHandle);
 //        glfwSetWindowFocusCallback(m_WindowHandle, window_focus_callback);
 
         set_icon(m_WindowHandle, 3);
@@ -190,7 +190,7 @@ namespace GGgui {
         // do not auto merge, so when the glfw enables mouse passthrough, the window inside the main viewport wont be unclickable
         io.ConfigViewportsNoAutoMerge = true;
 //        io.ConfigWindowsResizeFromEdges = true;
-        io.ConfigViewportsNoTaskBarIcon = true;
+//        io.ConfigViewportsNoTaskBarIcon = true;
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
@@ -258,14 +258,15 @@ namespace GGgui {
         // Main loop
         while (!glfwWindowShouldClose(m_WindowHandle) && m_Running) {
             int monitor_width, monitor_height;
-            glfwMaximizeWindow(m_WindowHandle);
-//            get_resolution(monitor_width, monitor_height);
-//            if(monitor_height != _monitor_height || monitor_width != _monitor_width){
-//                glfwSetWindowSize(m_WindowHandle, monitor_width, monitor_height);
-//                _monitor_width = monitor_width;
-//                _monitor_height = monitor_height;
-//                _monitor_aspect_ratio = 1.0f * _monitor_width / _monitor_height;
-//            }
+//            glfwMaximizeWindow(m_WindowHandle);
+            get_resolution(monitor_width, monitor_height);
+            if(monitor_height != _monitor_height || monitor_width != _monitor_width){
+                glfwSetWindowSize(m_WindowHandle, monitor_width - 1, monitor_height - 1);
+                glfwSetWindowPos(m_WindowHandle,0,0);
+                _monitor_width = monitor_width;
+                _monitor_height = monitor_height;
+                _monitor_aspect_ratio = 1.0f * _monitor_width / _monitor_height;
+            }
 
 
             // Poll and handle events (inputs, window resize, etc.)

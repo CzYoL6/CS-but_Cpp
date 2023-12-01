@@ -36,6 +36,9 @@ namespace GGgui {
         GLuint gl_texture_id() const { return gl_texture_id_; }
 
     private:
+        void checkGLError();
+
+    private:
         uint32_t image_width_{0};
         uint32_t image_height_{0};
         GLuint gl_texture_id_{0};

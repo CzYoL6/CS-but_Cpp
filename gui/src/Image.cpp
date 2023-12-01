@@ -3,8 +3,17 @@
 //
 
 #include <gui/Image.h>
+#include <GL/glu.h>
+#include <spdlog/spdlog.h>
 
 namespace GGgui {
+    void Image::checkGLError() {
+        GLenum error = glGetError();
+        if (error != GL_NO_ERROR) {
+            spdlog::error( "OpenGL Error: {}" ,(char*)gluErrorString(error) );
+            exit(-1);
+        }
+    }
     Image::Image(const std::string_view &file_path) {
         // TODO: add file path verification
         LoadDataFromFile(file_path);
@@ -26,14 +35,22 @@ namespace GGgui {
             image_height_ = height;
 
             GLuint textureID;
+
             glGenTextures(1, &textureID);
+
             glBindTexture(GL_TEXTURE_2D, textureID);
+
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width_, image_height_,
                          0,GL_RGBA, GL_UNSIGNED_BYTE, data);
+
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
             gl_texture_id_ = textureID;
+
         }
+        checkGLError();
     }
 
     void Image::LoadDataFromFile(const std::string_view &file_path) {

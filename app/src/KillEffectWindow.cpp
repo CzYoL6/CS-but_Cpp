@@ -19,13 +19,15 @@ void KillEffectWindow::OnUIRender() {
     Layer::OnUIRender();
     const auto& app = GGgui::Application::Get();
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration;
-    if(!_hidden) {
+//    if(true) {
+    if(!_hidden && SettingWindow::GetInstance().load_complete) {
         const auto viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos({0,0});
         ImGui::SetNextWindowSize(viewport->Size);
         ImGui::SetNextWindowViewport(viewport->ID);
 
         ImGui::Begin("Kill Effect Window", nullptr, window_flags);
+        ImGui::GetWindowViewport()->Flags |= ImGuiViewportFlags_TopMost;
         if(_frame_buffer->gl_texture_id() != 0 && _image_sequence_player->playing()){
             Settings& settings = SettingWindow::GetInstance().settings();
             float factor =  ImGui::GetWindowWidth() / 
@@ -79,7 +81,11 @@ void KillEffectWindow::Show() {
 void KillEffectWindow::OnUpdate(float ts) {
     Layer::OnUpdate(ts);
 //    spdlog::info("timestep: {}s\n", ts);
-
+    if(_show_effect_sign){
+        std::lock_guard<std::mutex> l(_show_effect_mutex);
+        ShowRoundKillEffect(_show_effect_count);
+        _show_effect_sign = false;
+    }
     _image_sequence_player->Update(ts);
 }
 
@@ -158,14 +164,15 @@ void KillEffectWindow::handle_data(const Json::Value &data) {
     round_kills = cur_player_round_kill;
 
     if (delta_round_kill > 0) {
-        ShowRoundKillEffect(cur_player_round_kill > _max_continuous_kill_count ?
-        _max_continuous_kill_count : cur_player_round_kill);
+        queue_show_effect_on_opengl_thread(cur_player_round_kill > _max_continuous_kill_count ?
+                                           _max_continuous_kill_count : cur_player_round_kill);
     }
 
 }
 
 void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
     assert(round_kill <= _max_continuous_kill_count);
+    if(!SettingWindow::GetInstance().load_complete) return;
     _image_sequence_player->ResetImageSequence(_image_buffer[round_kill - 1]);
     auto &app = GGgui::Application::Get();
     app.PlayAudio(std::format("assets\\audio\\{}kill.wav", round_kill));
@@ -193,5 +200,11 @@ void KillEffectWindow::LoadAssets() {
                               SettingWindow::GetInstance().settings().framerate,
                               SettingWindow::GetInstance().settings().asset_quality);
     });(void)_load_assets_thread;
+}
+
+void KillEffectWindow::queue_show_effect_on_opengl_thread(int count) {
+    std::lock_guard<std::mutex> l(_show_effect_mutex);
+    _show_effect_count = count;
+    _show_effect_sign = true;
 }
 

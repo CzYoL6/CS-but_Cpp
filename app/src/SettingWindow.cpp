@@ -28,17 +28,21 @@ void SettingWindow::OnUIRender()
 //        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, 5);
         ImGui::GetWindowViewport()->Flags |= ImGuiViewportFlags_TopMost;
 
+        static bool pre_load_complete = false;
+
         if (load_complete) {
-            static bool once = false;
-            if (!once) {
+            if(!pre_load_complete) {
+                pre_load_complete = true;
                 KillEffectWindow::GetInstance().Show();
-                glfwShowWindow(app.GetWindowHandle());
-                once = true;
+//                glfwShowWindow(app.GetWindowHandle());
+//                glfwMaximizeWindow(app.GetWindowHandle());
+//                glfwFocusWindow(app.GetWindowHandle());
             }
+
 
             ImGui::SameLine();
             if (ImGui::Button("Test")) {
-                KillEffectWindow::GetInstance().ShowRoundKillEffect(1);
+                KillEffectWindow::GetInstance().ShowRoundKillEffect(5);
             }
 
             ImGui::SameLine();
@@ -103,6 +107,10 @@ void SettingWindow::OnUIRender()
 
 //        ImGui::PopStyleVar();
         } else {
+            if(pre_load_complete && !load_complete){
+                pre_load_complete = false;
+            }
+            KillEffectWindow::GetInstance().Hide();
             ImGui::Text("Loading Assets...");
             ImGui::ProgressBar(assets_load_progress);
         }

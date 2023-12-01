@@ -44,6 +44,9 @@ private:
     std::vector<std::shared_ptr<std::vector<std::shared_ptr<EffectImage>>>> _image_buffer;
     bool _hidden{true};
     int _max_continuous_kill_count{5};
+    bool _show_effect_sign = false;
+    int _show_effect_count;
+    std::mutex _show_effect_mutex;
 
     std::filesystem::path _image_folder_path{"./Assets/banner/"};        // where kill banners are stored
                                                                   // the folder structure must be
@@ -59,6 +62,8 @@ private:
     httplib::Server _http_server;
     std::thread _http_server_thread;
     std::thread _load_assets_thread;
+
+    void queue_show_effect_on_opengl_thread(int count);
 };
 
 
