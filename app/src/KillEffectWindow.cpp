@@ -26,7 +26,8 @@ void KillEffectWindow::OnUIRender() {
         ImGui::Begin("Kill Effect Window", nullptr, window_flags);
         if(_frame_buffer->gl_texture_id() != 0 && _image_sequence_player->playing()){
             Settings& settings = SettingWindow::GetInstance().settings();
-            float factor =  ImGui::GetWindowWidth() / 3840.0f;
+            float factor =  ImGui::GetWindowWidth() / 
+                ((SettingWindow::GetInstance().settings().asset_quality==0)?1920.0f:3840.0f);
             ImGui::SetCursorPos({ImGui::GetWindowWidth()*0.5f +  - factor*_frame_buffer->image_width()*0.5f + settings.offset_x, ImGui::GetWindowHeight()*0.5f - factor*_frame_buffer->image_height() + settings.offset_y});
 //            std::cout <<ImGui::GetWindowWidth()*0.5f +  - factor*_frame_buffer->image_width()*0.5f + offset_x<<","<<ImGui::GetWindowHeight()*0.5f - factor*_frame_buffer->image_height()*0.5f + offset_y<<'\n';
             ImGui::Image(ImTextureID(_frame_buffer->gl_texture_id()),
@@ -82,7 +83,7 @@ void KillEffectWindow::OnUpdate(float ts) {
 
 
 
-void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complete, int framerate) {
+void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complete, int framerate, int quality) {
     for(int ckc = 1; ckc <= _max_continuous_kill_count; ckc++ ) {
         std::vector<std::shared_ptr<EffectImage>> images;
 
@@ -90,7 +91,7 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
 //        std::filesystem::path tmp = std::format("{}kill", ckc);
 //        std::filesystem::path image_folder_of_kill_count = _image_folder_path / tmp;
 //        std::filesystem::path image_folder_of_kill_count = std::format("E:\\Programming\\CS-but_Cpp\\cmake-build-release\\app\\Assets\\banner\\{}kill\\", ckc);
-        std::filesystem::path image_folder_of_kill_count = std::format("assets\\banner\\{}kill\\", ckc);
+        std::filesystem::path image_folder_of_kill_count = std::format("assets\\banner\\{}\\{}kill\\", quality==0?"1080p120hz":"2k120hz", ckc);
 //        std::cout << image_folder_of_kill_count.string() << '\n';
 //        std::cout << std::filesystem::exists(image_folder_of_kill_count) << std::endl;
 //        std::cout <<std::filesystem::is_directory(image_folder_of_kill_count)  << std::endl;
@@ -105,7 +106,7 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
                 }
             }
             std::sort(files.begin(), files.end());
-            for (int k = 0; k < files.size(); k += framerate==0 ? 2 : 1) {
+            for (int k = 0; k < files.size(); k += (framerate==0 ? 2 : 1)) {
                 auto &f = files[k];
 //                std::cout << f.string() << '\n';
                 images.push_back(std::make_shared<EffectImage>(f.string()));
@@ -186,6 +187,8 @@ void KillEffectWindow::LoadAssets() {
     if(_load_assets_thread.joinable()) _load_assets_thread.join();
     _load_assets_thread = std::thread([this](){
         load_images_from_disk(&SettingWindow::GetInstance().assets_load_progress,
-                              &SettingWindow::GetInstance().load_complete, SettingWindow::GetInstance().settings().framerate);
+                              &SettingWindow::GetInstance().load_complete, 
+                              SettingWindow::GetInstance().settings().framerate,
+                              SettingWindow::GetInstance().settings().asset_quality);
     });(void)_load_assets_thread;
 }

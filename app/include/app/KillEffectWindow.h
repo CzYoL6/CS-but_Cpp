@@ -33,7 +33,7 @@ public:
     void ShowRoundKillEffect(int round_kill);
     void LoadAssets();
 private:
-    void load_images_from_disk(float *progress, bool *load_complete, int framerate);
+    void load_images_from_disk(float *progress, bool *load_complete, int framerate, int quality);
     void handle_data(const Json::Value& data);
 public:
     bool hidden() const { return _hidden; }
