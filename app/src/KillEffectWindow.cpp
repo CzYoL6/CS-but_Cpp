@@ -82,7 +82,7 @@ void KillEffectWindow::OnUpdate(float ts) {
 
 
 
-void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complete) {
+void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complete, int framerate) {
     for(int ckc = 1; ckc <= _max_continuous_kill_count; ckc++ ) {
         std::vector<std::shared_ptr<EffectImage>> images;
 
@@ -104,8 +104,9 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
                     files.push_back(f.path());
                 }
             }
-//            std::sort(files.begin(), files.end());
-            for (auto &f: files) {
+            std::sort(files.begin(), files.end());
+            for (int k = 0; k < files.size(); k += framerate==0 ? 2 : 1) {
+                auto &f = files[k];
 //                std::cout << f.string() << '\n';
                 images.push_back(std::make_shared<EffectImage>(f.string()));
             }
@@ -126,7 +127,7 @@ KillEffectWindow::KillEffectWindow() {
     _instance = this;
 
     _frame_buffer = std::make_shared<GGgui::Image>();
-    _image_sequence_player = std::make_shared<ImageSequencePlayer>(120, _frame_buffer);
+    _image_sequence_player = std::make_shared<ImageSequencePlayer>(SettingWindow::GetInstance().settings().framerate==0?60:120, _frame_buffer);
 
 }
 
@@ -178,12 +179,13 @@ void KillEffectWindow::OnDetach() {
 
 void KillEffectWindow::LoadAssets() {
     _image_sequence_player->Stop();
+    _image_sequence_player->set_framerate(SettingWindow::GetInstance().settings().framerate==0?60:120);
     _image_buffer.clear();
     SettingWindow::GetInstance().assets_load_progress = 0.0f;
     SettingWindow::GetInstance().load_complete = false;
     if(_load_assets_thread.joinable()) _load_assets_thread.join();
     _load_assets_thread = std::thread([this](){
         load_images_from_disk(&SettingWindow::GetInstance().assets_load_progress,
-                              &SettingWindow::GetInstance().load_complete);
+                              &SettingWindow::GetInstance().load_complete, SettingWindow::GetInstance().settings().framerate);
     });(void)_load_assets_thread;
 }

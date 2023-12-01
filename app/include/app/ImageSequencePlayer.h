@@ -27,6 +27,7 @@ public:
     int framerate() const {return _framerate;}
     int current_frame_index() const {return _current_frame_index;}
     bool playing() const { return _playing;}
+    void set_framerate(int v) {_framerate = v;}
 
 private:
     int _framerate;
