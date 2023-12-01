@@ -13,3 +13,16 @@ Steps:
     to set your system resolution first and then run the game in full-screen window mode.
 
     6.Enjoy the game!
+
+步骤:
+    1.打开CS2配置文件夹（.../steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg）
+
+    2.将gamestate_integration_cs2.cfg复制并粘贴到上述文件夹中。
+
+    3.启动CS-but.exe，这将开始加载所有资源。当前所有资源将加载到内存中，更高质量和帧数的资源会占用更多的内存，影响游戏帧数，请确保您有足够的内存（这在未来将得到改进）。
+
+    4.在加载完成后，您可以测试或更改所有设置。通过Ctrl + F12显示/隐藏设置窗口。
+
+    5.启动CS2，将游戏设置为"全屏窗口模式"。如果您想使用4:3的宽高比玩游戏，您可能需要首先设置系统分辨率，然后以"全屏窗口模式"运行游戏。
+
+    6.尽情享受游戏！
