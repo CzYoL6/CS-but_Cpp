@@ -23,6 +23,7 @@ namespace GGgui {
 
 int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow)
 {
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
 	return GGgui::Main(__argc, __argv);
 }
 
