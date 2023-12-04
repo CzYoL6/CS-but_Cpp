@@ -10,6 +10,7 @@
 #include <fstream>
 #include <thread>
 #include <spdlog/spdlog.h>
+#include <app/Asset.h>
 
 struct Settings{
     Settings(){
@@ -25,6 +26,9 @@ struct Settings{
             framerate = setting["framerate"].asInt();
             only_show_effect_when_im_playing = setting["only_show_effect_when_im_playing"].asBool();
             steamid = setting["steamid"].asString();
+            asset_preset = setting["asset_preset"].asInt();
+
+
             file.close();
             spdlog::warn("Settings loaded.");
         }
@@ -36,7 +40,8 @@ struct Settings{
                     "asset_quality" : 0,
                     "framerate" : 0,
                     "only_show_effect_when_im_playing" : false,
-                    "steamid" : ""
+                    "steamid" : "",
+                    "asset_preset" : 0
                     })", setting);
             std::ofstream file(setting_file );
             file << setting;
@@ -53,6 +58,7 @@ struct Settings{
         setting["framerate"] = framerate;
         setting["only_show_effect_when_im_playing"] = only_show_effect_when_im_playing;
         setting["steamid"] = steamid;
+        setting["asset_preset"] = asset_preset;
         std::filesystem::path setting_file = "settings.json";
         std::ofstream file(setting_file);
         file << setting;
@@ -67,6 +73,7 @@ struct Settings{
 
     bool only_show_effect_when_im_playing{false};
     std::string steamid;
+    int asset_preset{0};
 };
 
 class SettingWindow : public GGgui::Layer
@@ -79,6 +86,7 @@ public:
 private:
     static SettingWindow* _instance;
     Settings _settings;
+    Assets _assets;
     std::thread _hotkey_capture_thread;
     static std::pair<int, int> get_memory_consumption(); // <virtual mem, physical mem> MB
 public:
@@ -93,6 +101,7 @@ public:
     virtual void OnUpdate(float ts) override;
 
     Settings& settings() {return _settings;}
+    Assets& assets() {return _assets;}
 public:
     bool show = true;
     float assets_load_progress = 0.0f;

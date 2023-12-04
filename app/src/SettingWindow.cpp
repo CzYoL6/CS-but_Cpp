@@ -19,7 +19,6 @@ void SettingWindow::OnUIRender()
 //    std::cout << GGgui::Input::IsKeyDown(GGgui::KeyCode::A) << '\n';
 //    if(ImGui::IsKeyDown(GLFW_KEY_F6)) show = !show;
 
-    Settings& settings = SettingWindow::GetInstance().settings();
     if(show) {
 //        if(true) {
         ImGui::SetNextWindowSize({600, 0});
@@ -67,18 +66,21 @@ void SettingWindow::OnUIRender()
             ////////////////////////////////////////////////////////////////////////////////////////
             ImGui::Spacing();
             ImGui::Text("Offset");
-            ImGui::DragInt("Offset X", &settings.offset_x);
-            ImGui::DragInt("Offset Y", &settings.offset_y);
+            ImGui::DragInt("Offset X", &_settings.offset_x);
+            ImGui::DragInt("Offset Y", &_settings.offset_y);
 
             ImGui::Separator();
 
+            ImGui::Combo("Asset Preset", &_settings.asset_preset,_assets.asset_names, IM_ARRAYSIZE(_assets.asset_names));
+            ImGui::Separator();
+
             ImGui::Text("Asset Quality");
-            ImGui::RadioButton("Medium", &settings.asset_quality, 0);
+            ImGui::RadioButton("Medium", &_settings.asset_quality, 0);
             ImGui::SameLine();
-            ImGui::RadioButton("High", &settings.asset_quality, 1);
+            ImGui::RadioButton("High", &_settings.asset_quality, 1);
 
             const char *framerates[] = {"60fps", "120fps"};
-            ImGui::Combo("Framerate", &settings.framerate, framerates, IM_ARRAYSIZE(framerates));
+            ImGui::Combo("Framerate", &_settings.framerate, framerates, IM_ARRAYSIZE(framerates));
             if(ImGui::Button("Reload Assets")){
                 spdlog::warn("Reloading Assets");
                 KillEffectWindow::GetInstance().LoadAssets();
@@ -88,15 +90,15 @@ void SettingWindow::OnUIRender()
             //////////////////////////////////////////////////////////////////////////////////////////
             ImGui::Separator();
             ImGui::Text("Other");
-            ImGui::Checkbox("Only show effect when I'm playing(disable when spectating)", &settings.only_show_effect_when_im_playing);
-            if(!settings.only_show_effect_when_im_playing)
+            ImGui::Checkbox("Only show effect when I'm playing(disable when spectating)", &_settings.only_show_effect_when_im_playing);
+            if(!_settings.only_show_effect_when_im_playing)
                 ImGui::BeginDisabled();
             char steamid[1024];
-            memcpy(steamid, settings.steamid.c_str(),settings.steamid.size());
-            steamid[settings.steamid.size()] = '\0';
+            memcpy(steamid, _settings.steamid.c_str(),_settings.steamid.size());
+            steamid[_settings.steamid.size()] = '\0';
             ImGui::InputText("steamid", steamid, sizeof(steamid));
-            settings.steamid = steamid;
-            if(!settings.only_show_effect_when_im_playing)
+            _settings.steamid = steamid;
+            if(!_settings.only_show_effect_when_im_playing)
                 ImGui::EndDisabled();
 
             //TODO: add volume control

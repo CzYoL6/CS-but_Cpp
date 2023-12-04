@@ -91,21 +91,15 @@ void KillEffectWindow::OnUpdate(float ts) {
 
 
 
-void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complete, int framerate, int quality) {
+void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complete, std::string_view kill_banner_folder, int framerate,
+                                             int quality) {
     for(int ckc = 1; ckc <= _max_continuous_kill_count; ckc++ ) {
         std::vector<std::shared_ptr<EffectImage>> images;
 
         //load images from disk
-//        std::filesystem::path tmp = std::format("{}kill", ckc);
-//        std::filesystem::path image_folder_of_kill_count = _image_folder_path / tmp;
-//        std::filesystem::path image_folder_of_kill_count = std::format("E:\\Programming\\CS-but_Cpp\\cmake-build-release\\app\\Assets\\banner\\{}kill\\", ckc);
-        std::filesystem::path image_folder_of_kill_count = std::format("assets\\banner\\{}\\{}kill\\", quality==0?"1080p120hz":"2k120hz", ckc);
-//        std::cout << image_folder_of_kill_count.string() << '\n';
-//        std::cout << std::filesystem::exists(image_folder_of_kill_count) << std::endl;
-//        std::cout <<std::filesystem::is_directory(image_folder_of_kill_count)  << std::endl;
+        std::filesystem::path image_folder_of_kill_count = std::format("assets\\{}\\{}\\{}kill\\",  kill_banner_folder, quality==0?"1080p120hz":"2k120hz", ckc);
         if (std::filesystem::exists(image_folder_of_kill_count) &&
             std::filesystem::is_directory(image_folder_of_kill_count)) {
-//if(true){
             std::vector<std::filesystem::path> files;
             std::string png_ext = ".png";
             for (auto &f: std::filesystem::directory_iterator(image_folder_of_kill_count)) {
@@ -116,16 +110,13 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
             std::sort(files.begin(), files.end());
             for (int k = 0; k < files.size(); k += (framerate==0 ? 2 : 1)) {
                 auto &f = files[k];
-//                std::cout << f.string() << '\n';
                 images.push_back(std::make_shared<EffectImage>(f.string()));
             }
-//            std::cout << images.size() << '\n';
             _image_buffer.push_back(std::make_shared<std::vector<std::shared_ptr<EffectImage>>>(std::move(images)));
         }
 
         *progress += 1.0f / _max_continuous_kill_count;
     }
-//    std::cout << _image_buffer.size() << std::endl;
     *load_complete = true;
     spdlog::warn("loading images to memory succeeded.");
 }
@@ -157,8 +148,6 @@ void KillEffectWindow::handle_data(const Json::Value &data) {
         round_kills = cur_player_round_kill;
     }
 
-//    if (data["previously"]["player"]["state"]["round_kills"].empty()) return;
-//    int previous_player_round_kill = data["previously"]["player"]["state"]["round_kills"].asInt();
     int delta_round_kill = cur_player_round_kill - round_kills;
 
     round_kills = cur_player_round_kill;
@@ -196,7 +185,10 @@ void KillEffectWindow::LoadAssets() {
     if(_load_assets_thread.joinable()) _load_assets_thread.join();
     _load_assets_thread = std::thread([this](){
         load_images_from_disk(&SettingWindow::GetInstance().assets_load_progress,
-                              &SettingWindow::GetInstance().load_complete, 
+                              &SettingWindow::GetInstance().load_complete,
+                              SettingWindow::GetInstance().assets()
+                                      .asset_configs[SettingWindow::GetInstance().settings().asset_preset]
+                                      .kill_banner_asset_folder,
                               SettingWindow::GetInstance().settings().framerate,
                               SettingWindow::GetInstance().settings().asset_quality);
     });(void)_load_assets_thread;
