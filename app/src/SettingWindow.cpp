@@ -56,29 +56,41 @@ void SettingWindow::OnUIRender()
             ImGui::PopStyleColor(1);
 
             ImGui::SameLine();
-            ImGui::Text("Use Ctrl+F12 to show and hide this window.");
-            ImGui::Separator();
+            ImGui::Text("Press Ctrl+F12 to show/hide this window.");
 
-            ImGui::Text("Memory consumption");
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Memory Consumption");
+            ImGui::Spacing();
             auto mem = get_memory_consumption();
             ImGui::Text("Virtual Memory: %d MB", mem.first);
             ImGui::Text("Physical Memory: %d MB", mem.second);
 
-            ImGui::Separator();
-            ////////////////////////////////////////////////////////////////////////////////////////
             ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+            ////////////////////////////////////////////////////////////////////////////////////////
             ImGui::Text("Offset");
+            ImGui::Spacing();
             ImGui::DragInt("Offset X", &_settings.offset_x);
             ImGui::DragInt("Offset Y", &_settings.offset_y);
 
+            ImGui::Spacing();
             ImGui::Separator();
+            ImGui::Spacing();
 
             AssetConfig& current_asset = _assets.asset_configs[_settings.asset_preset];
+            ImGui::Text("Asset Preset");
+            ImGui::Spacing();
+
+
+
             if(ImGui::Button("Add")){
                 // copy the last one
                 _assets.asset_configs.push_back( _assets.asset_configs[_assets.asset_configs.size() - 1]);
-                _assets.asset_configs[_assets.asset_configs.size() - 1].asset_name =
-                        std::format("Custom Asset Prest {}", _assets.asset_configs.size() - 1);
+                _assets.asset_configs[_assets.asset_configs.size() - 1].asset_name ="Asset Prest";
                 _assets.asset_configs[_assets.asset_configs.size() - 1].is_custom = true;
 
                 // show the new one
@@ -86,14 +98,14 @@ void SettingWindow::OnUIRender()
 
                 _assets.ReassignAssetNames();
             }
-
-            if(!current_asset.is_custom) ImGui::BeginDisabled();
             ImGui::SameLine();
+            if(!current_asset.is_custom) ImGui::BeginDisabled();
             if(ImGui::Button("Delete")){
                 _assets.asset_configs.erase(_assets.asset_configs.begin() + _settings.asset_preset);
                 _settings.asset_preset = 0;
-
                 _assets.ReassignAssetNames();
+
+                spdlog::info("Delete Asset Preset \"{}\".", current_asset.asset_name);
             }
             if(!current_asset.is_custom) ImGui::EndDisabled();
 
@@ -101,6 +113,10 @@ void SettingWindow::OnUIRender()
             if(!current_asset.is_custom){
                 ImGui::BeginDisabled();
             }
+
+
+
+
             ImGui::InputText("Asset Name", &current_asset.asset_name);
             ImGui::SameLine();
             if(ImGui::Button("Save")){
@@ -132,7 +148,6 @@ void SettingWindow::OnUIRender()
             ImGui::PopID();
             ImGui::DragInt("Max Kill Count Of Sound", &current_asset.max_kill_sound_count, 1, 1, 10);
 
-            ImGui::Separator();
 
             ImGui::Checkbox("Enable Headshot", &current_asset.enable_headshot);
             if(current_asset.enable_headshot) {
@@ -166,6 +181,10 @@ void SettingWindow::OnUIRender()
                 ImGui::EndDisabled();
             }
 
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
             ImGui::Text("Asset Quality");
             ImGui::RadioButton("Medium", &_settings.asset_quality, 0);
             ImGui::SameLine();
@@ -180,7 +199,10 @@ void SettingWindow::OnUIRender()
 
 
             //////////////////////////////////////////////////////////////////////////////////////////
+            ImGui::Spacing();
             ImGui::Separator();
+            ImGui::Spacing();
+
             ImGui::Text("Other");
             ImGui::Checkbox("Only show effect when I'm playing(disable when spectating)", &_settings.only_show_effect_when_im_playing);
             if(_settings.only_show_effect_when_im_playing) {

@@ -105,13 +105,15 @@ struct Assets{
         }
         delete[] asset_names;
 
-        std::cout << asset_configs.size() << '\n';
-
         asset_names = new char*[asset_configs.size()];
         for(int i = 0; i < asset_configs.size(); i++){
-            asset_names[i] = new char[asset_configs[i].asset_name.size()+1];
-            asset_names[i][asset_configs[i].asset_name.size()]='\0';
-            memcpy(asset_names[i], asset_configs[i].asset_name.c_str(), asset_configs[i].asset_name.size());
+            std::string n = asset_configs[i].asset_name;
+            if(asset_configs[i].is_custom) {
+                n += " (Custom)";
+            }
+            asset_names[i] = new char[n.size() + 1];
+            asset_names[i][n.size()] = '\0';
+            memcpy(asset_names[i], n.c_str(), n.size());
         }
     }
 
