@@ -54,6 +54,50 @@
       "enable_headshot" : true,
       "headshot_banner_folder": "assets/CF/banner/headshot_2",
       "headshot_sound_file": "assets/CF/audio/Swat-GlobalRisk/headshot.wav"
+    },
+    {
+      "asset_name" : "CF FlyingTigers GlobalRisk, Headshot1",
+      "is_custom" : false,
+      "kill_banner_asset_folder": "assets/CF/banner/round_kill",
+      "max_kill_banner_count" : 6,
+      "kill_sound_asset_folder":  "assets/CF/audio/FlyingTigers-GlobalRisk",
+      "max_kill_sound_count" : 9,
+      "enable_headshot" : true,
+      "headshot_banner_folder": "assets/CF/banner/headshot_1",
+      "headshot_sound_file": "assets/CF/audio/FlyingTigers-GlobalRisk/headshot.wav"
+    },
+    {
+      "asset_name" : "CF FlyingTigers GlobalRisk, Headshot2",
+      "is_custom" : false,
+      "kill_banner_asset_folder": "assets/CF/banner/round_kill",
+      "max_kill_banner_count" : 6,
+      "kill_sound_asset_folder":  "assets/CF/audio/FlyingTigers-GlobalRisk",
+      "max_kill_sound_count" : 9,
+      "enable_headshot" : true,
+      "headshot_banner_folder": "assets/CF/banner/headshot_2",
+      "headshot_sound_file": "assets/CF/audio/FlyingTigers-GlobalRisk/headshot.wav"
+    },
+    {
+      "asset_name" : "CF FlyingTigers BlackList, Headshot1",
+      "is_custom" : false,
+      "kill_banner_asset_folder": "assets/CF/banner/round_kill",
+      "max_kill_banner_count" : 6,
+      "kill_sound_asset_folder":  "assets/CF/audio/FlyingTigers-BlackList",
+      "max_kill_sound_count" : 9,
+      "enable_headshot" : true,
+      "headshot_banner_folder": "assets/CF/banner/headshot_1",
+      "headshot_sound_file": "assets/CF/audio/FlyingTigers-BlackList/headshot.wav"
+    },
+    {
+      "asset_name" : "CF FlyingTigers BlackList, Headshot2",
+      "is_custom" : false,
+      "kill_banner_asset_folder": "assets/CF/banner/round_kill",
+      "max_kill_banner_count" : 6,
+      "kill_sound_asset_folder":  "assets/CF/audio/FlyingTigers-BlackList",
+      "max_kill_sound_count" : 9,
+      "enable_headshot" : true,
+      "headshot_banner_folder": "assets/CF/banner/headshot_2",
+      "headshot_sound_file": "assets/CF/audio/FlyingTigers-BlackList/headshot.wav"
     }
   ]
 }
