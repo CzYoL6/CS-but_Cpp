@@ -11,11 +11,11 @@
 #include <thread>
 #include <spdlog/spdlog.h>
 #include <app/Asset.h>
-
+#include <app/WindowsFileDialog.h>
 struct Settings{
     Settings(){
         Json::Value setting;
-        std::filesystem::path setting_file = "settings.json";
+        std::filesystem::path setting_file = FileDialog::getCanonicalPath("settings.json");
         if(std::filesystem::exists(setting_file)) {
             std::ifstream file(setting_file);
             file >> setting;
@@ -51,6 +51,10 @@ struct Settings{
     }
 
     ~Settings(){
+        Save();
+    }
+
+    void Save(){
         Json::Value setting;
         setting["offset_x"] = offset_x;
         setting["offset_y"] = offset_y;
@@ -59,11 +63,12 @@ struct Settings{
         setting["only_show_effect_when_im_playing"] = only_show_effect_when_im_playing;
         setting["steamid"] = steamid;
         setting["asset_preset"] = asset_preset;
-        std::filesystem::path setting_file = "settings.json";
+        std::filesystem::path setting_file = FileDialog::getCanonicalPath("settings.json");
         std::ofstream file(setting_file);
         file << setting;
         file.close();
         spdlog::warn("Settings saved.");
+
     }
 
     int offset_x{0};

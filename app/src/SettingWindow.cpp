@@ -30,6 +30,7 @@ void SettingWindow::OnUIRender()
 //        ImGui::GetWindowViewport()->Flags |= ImGuiViewportFlags_TopMost;
 
         static bool pre_load_complete = false;
+        static bool reload = false;
 
         if (load_complete) {
             if(!pre_load_complete) {
@@ -118,10 +119,11 @@ void SettingWindow::OnUIRender()
             ImGui::SameLine();
             ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(255, 255, 0, 255));
             ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
-            if(ImGui::Button("Reload Assets")){
-                spdlog::warn("Reloading Assets");
-                KillEffectWindow::GetInstance().LoadAssets();
+            ImGui::PushID(1);
+            if(ImGui::Button("Save & Reload")){
+                reload = true;
             }
+            ImGui::PopID();
             ImGui::PopStyleColor(2);
             ImGui::SameLine();
             ImGui::Text("Reload assets after any changes are made.");
@@ -202,10 +204,11 @@ void SettingWindow::OnUIRender()
 
             ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(255, 255, 0, 255));
             ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
-            if(ImGui::Button("Reload Assets")){
-                spdlog::warn("Reloading Assets");
-                KillEffectWindow::GetInstance().LoadAssets();
+            ImGui::PushID(2);
+            if(ImGui::Button("Save & Reload")){
+                reload = true;
             }
+            ImGui::PopID();
             ImGui::PopStyleColor(2);
 
             ImGui::SameLine();
@@ -239,6 +242,15 @@ void SettingWindow::OnUIRender()
             ImGui::ProgressBar(assets_load_progress);
         }
         ImGui::End();
+
+
+        if(reload){
+            reload = false;
+            _settings.Save() ;
+            _assets.Save() ;
+            spdlog::warn("Reloading Assets");
+            KillEffectWindow::GetInstance().LoadAssets();
+        }
     }
 //    ImGui::ShowDemoWindow();
 }

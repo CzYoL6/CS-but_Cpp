@@ -10,6 +10,7 @@
 #include <spdlog/spdlog.h>
 #include <fstream>
 #include <set>
+#include <app/WindowsFileDialog.h>
 
 
 struct AssetConfig {
@@ -55,7 +56,7 @@ struct AssetConfig {
 struct Assets{
     Assets(){
         Json::Value assets;
-        std::filesystem::path assets_file = "assets/asset_config.json";
+        std::filesystem::path assets_file = FileDialog::getCanonicalPath("assets/asset_config.json");
         if(std::filesystem::exists(assets_file)){
             std::ifstream file(assets_file);
             file >> assets;
@@ -85,8 +86,13 @@ struct Assets{
         }
         delete[] asset_names;
 
+        Save();
+
+    }
+
+    void Save(){
         Json::Value assets;
-        std::filesystem::path assets_file = "assets/asset_config.json";
+        std::filesystem::path assets_file = FileDialog::getCanonicalPath("assets/asset_config.json");
         assets["assets"] = Json::Value(Json::arrayValue) ;
         for(int i = 0; i < asset_configs.size(); i++){
             assets["assets"].append(Json::Value(Json::objectValue));
