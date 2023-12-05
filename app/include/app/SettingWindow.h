@@ -89,6 +89,9 @@ private:
     Assets _assets;
     std::thread _hotkey_capture_thread;
     static std::pair<int, int> get_memory_consumption(); // <virtual mem, physical mem> MB
+    int add_custom_asset_preset();
+    void delete_custom_asset_preset(int id) ;
+
 public:
     static SettingWindow& GetInstance() {
         assert(_instance != nullptr);

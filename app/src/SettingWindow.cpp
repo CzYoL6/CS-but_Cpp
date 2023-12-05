@@ -74,11 +74,39 @@ void SettingWindow::OnUIRender()
             ImGui::Separator();
 
             AssetConfig& current_asset = _assets.asset_configs[_settings.asset_preset];
-            ImGui::Combo("Asset Preset", &_settings.asset_preset,_assets.asset_names, IM_ARRAYSIZE(_assets.asset_names));
+            if(ImGui::Button("Add")){
+                // copy the last one
+                _assets.asset_configs.push_back( _assets.asset_configs[_assets.asset_configs.size() - 1]);
+                _assets.asset_configs[_assets.asset_configs.size() - 1].asset_name =
+                        std::format("Custom Asset Prest {}", _assets.asset_configs.size() - 1);
+                _assets.asset_configs[_assets.asset_configs.size() - 1].is_custom = true;
+
+                // show the new one
+                _settings.asset_preset = _assets.asset_configs.size() - 1;
+
+                _assets.ReassignAssetNames();
+            }
+
+            if(!current_asset.is_custom) ImGui::BeginDisabled();
+            ImGui::SameLine();
+            if(ImGui::Button("Delete")){
+                _assets.asset_configs.erase(_assets.asset_configs.begin() + _settings.asset_preset);
+                _settings.asset_preset = 0;
+
+                _assets.ReassignAssetNames();
+            }
+            if(!current_asset.is_custom) ImGui::EndDisabled();
+
+            ImGui::Combo("Asset Preset", &_settings.asset_preset,_assets.asset_names, _assets.asset_configs.size());
             if(!current_asset.is_custom){
                 ImGui::BeginDisabled();
             }
             ImGui::InputText("Asset Name", &current_asset.asset_name);
+            ImGui::SameLine();
+            if(ImGui::Button("Save")){
+                _assets.ReassignAssetNames();
+            }
+
             ImGui::BeginDisabled();
             ImGui::InputText("Kill Banner Folder", &current_asset.kill_banner_asset_folder);
             ImGui::EndDisabled();
@@ -104,9 +132,6 @@ void SettingWindow::OnUIRender()
             ImGui::PopID();
             ImGui::DragInt("Max Kill Count Of Sound", &current_asset.max_kill_sound_count, 1, 1, 10);
 
-            if(!current_asset.is_custom){
-                ImGui::EndDisabled();
-            }
             ImGui::Separator();
 
             ImGui::Checkbox("Enable Headshot", &current_asset.enable_headshot);
@@ -137,6 +162,10 @@ void SettingWindow::OnUIRender()
                 }
                 ImGui::PopID();
             }
+            if(!current_asset.is_custom){
+                ImGui::EndDisabled();
+            }
+
             ImGui::Text("Asset Quality");
             ImGui::RadioButton("Medium", &_settings.asset_quality, 0);
             ImGui::SameLine();
@@ -215,4 +244,12 @@ std::pair<int, int> SettingWindow::get_memory_consumption(){
         spdlog::error("Error getting process memory information. Error code: {}",GetLastError() );
         exit(-1);
     }
+}
+
+int SettingWindow::add_custom_asset_preset() {
+    return 0;
+}
+
+void SettingWindow::delete_custom_asset_preset(int id) {
+
 }

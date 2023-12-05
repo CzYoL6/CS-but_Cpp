@@ -9,6 +9,7 @@
 #include <json/json.h>
 #include <spdlog/spdlog.h>
 #include <fstream>
+#include <set>
 
 
 struct AssetConfig {
@@ -65,7 +66,8 @@ struct Assets{
 
             asset_names = new char*[assets["assets"].size()];
             for(int i = 0; i < asset_configs.size(); i++){
-                asset_names[i] = new char[asset_configs[i].asset_name.size()];
+                asset_names[i] = new char[asset_configs[i].asset_name.size()+1];
+                asset_names[i][asset_configs[i].asset_name.size()]='\0';
                 memcpy(asset_names[i], asset_configs[i].asset_name.c_str(), asset_configs[i].asset_name.size());
             }
             file.close();
@@ -82,23 +84,34 @@ struct Assets{
             delete[] asset_names[i];
         }
         delete[] asset_names;
+
         Json::Value assets;
         std::filesystem::path assets_file = "assets/asset_config.json";
-        if(std::filesystem::exists(assets_file)){
-            std::ifstream file(assets_file);
-            file >> assets;
-            file.close();
-            for(int i = 0; i < assets["assets"].size(); i++){
-                asset_configs[i].WriteToJson(assets["assets"][i]);
-            }
-            std::ofstream file_(assets_file);
-            file_ << assets;
-            file_.close();
-            spdlog::warn("{} assets saved.", assets["assets"].size());
+        assets["assets"] = Json::Value(Json::arrayValue) ;
+        for(int i = 0; i < asset_configs.size(); i++){
+            assets["assets"].append(Json::Value(Json::objectValue));
+            asset_configs[i].WriteToJson(assets["assets"][i]);
         }
-        else{
-            spdlog::error("Asset config file not found.");
-            exit(-1);
+        std::ofstream file_(assets_file);
+        file_ << assets;
+        file_.close();
+        spdlog::warn("{} assets saved.", assets["assets"].size());
+
+    }
+
+    void ReassignAssetNames(){
+        for(int i = 0; i < sizeof(asset_names) / sizeof(asset_names[0]); i++){
+            delete[] asset_names[i];
+        }
+        delete[] asset_names;
+
+        std::cout << asset_configs.size() << '\n';
+
+        asset_names = new char*[asset_configs.size()];
+        for(int i = 0; i < asset_configs.size(); i++){
+            asset_names[i] = new char[asset_configs[i].asset_name.size()+1];
+            asset_names[i][asset_configs[i].asset_name.size()]='\0';
+            memcpy(asset_names[i], asset_configs[i].asset_name.c_str(), asset_configs[i].asset_name.size());
         }
     }
 
