@@ -27,7 +27,7 @@ void SettingWindow::OnUIRender()
         ImGui::Begin("CS but Valorant v1.1", nullptr,
                      ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
 //        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, 5);
-        ImGui::GetWindowViewport()->Flags |= ImGuiViewportFlags_TopMost;
+//        ImGui::GetWindowViewport()->Flags |= ImGuiViewportFlags_TopMost;
 
         static bool pre_load_complete = false;
 
@@ -105,15 +105,15 @@ void SettingWindow::OnUIRender()
                 _assets.ReassignAssetNames();
             }
             ImGui::SameLine();
-            if(!current_asset().is_custom) ImGui::BeginDisabled();
+            bool tmp = !current_asset().is_custom;
+            if(tmp) ImGui::BeginDisabled();
             if(ImGui::Button("Delete")){
+                spdlog::info("Delete Asset Preset \"{}\".", current_asset().asset_name);
                 _assets.asset_configs.erase(_assets.asset_configs.begin() + _settings.asset_preset);
                 _settings.asset_preset = 0;
                 _assets.ReassignAssetNames();
-
-                spdlog::info("Delete Asset Preset \"{}\".", current_asset().asset_name);
             }
-            if(!current_asset().is_custom) ImGui::EndDisabled();
+            if(tmp) ImGui::EndDisabled();
 
             ImGui::SameLine();
             ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(255, 255, 0, 255));
@@ -127,12 +127,10 @@ void SettingWindow::OnUIRender()
             ImGui::Text("Reload assets after any changes are made.");
 
             ImGui::Combo("Asset Preset", &_settings.asset_preset,_assets.asset_names, _assets.asset_configs.size());
-            if(!current_asset().is_custom){
+            tmp = !current_asset().is_custom;
+            if(tmp){
                 ImGui::BeginDisabled();
             }
-
-
-
 
             ImGui::InputText("Asset Name", &current_asset().asset_name);
             ImGui::SameLine();
@@ -146,9 +144,7 @@ void SettingWindow::OnUIRender()
             ImGui::SameLine();
             ImGui::PushID(1);
             if(ImGui::Button("Select")){
-                std::filesystem::path path = openFolderDialog();
-                std::filesystem::path rel_path = std::filesystem::relative(path, std::filesystem::current_path());
-                current_asset().kill_banner_asset_folder = rel_path.string();
+                FileDialog::openFolderDialog(current_asset().kill_banner_asset_folder);
             }
             ImGui::PopID();
             ImGui::DragInt("Max Kill Count Of Banner", &current_asset().max_kill_banner_count, 1, 1, 100);
@@ -158,9 +154,7 @@ void SettingWindow::OnUIRender()
             ImGui::SameLine();
             ImGui::PushID(2);
             if(ImGui::Button("Select")){
-                std::filesystem::path path = openFolderDialog();
-                std::filesystem::path rel_path = std::filesystem::relative(path, std::filesystem::current_path());
-                current_asset().kill_sound_asset_folder = rel_path.string();
+                FileDialog::openFolderDialog(current_asset().kill_sound_asset_folder);
             }
             ImGui::PopID();
             ImGui::DragInt("Max Kill Count Of Sound", &current_asset().max_kill_sound_count, 1, 1, 100);
@@ -175,26 +169,22 @@ void SettingWindow::OnUIRender()
                 ImGui::SameLine();
                 ImGui::PushID(3);
                 if (ImGui::Button("Select")) {
-                    std::filesystem::path path = openFolderDialog();
-                    std::filesystem::path rel_path = std::filesystem::relative(path, std::filesystem::current_path());
-                    current_asset().headshot_banner_folder = rel_path.string();
+                    FileDialog::openFolderDialog(current_asset().headshot_banner_folder);
                 }
                 ImGui::PopID();
 
                 ImGui::BeginDisabled();
-                ImGui::InputText("Headshot Sound Folder", &current_asset().headshot_sound_file);
+                ImGui::InputText("Headshot Sound File", &current_asset().headshot_sound_file);
                 ImGui::EndDisabled();
 
                 ImGui::SameLine();
                 ImGui::PushID(4);
                 if (ImGui::Button("Select")) {
-                    std::filesystem::path path = openFileDialog("All Files\0*.wav\0");
-                    std::filesystem::path rel_path = std::filesystem::relative(path, std::filesystem::current_path());
-                    current_asset().headshot_sound_file = rel_path.string();
+                    FileDialog::openFileDialog(current_asset().headshot_sound_file, "Wave Files\0*.wav\0All Files\0*.*\0");
                 }
                 ImGui::PopID();
             }
-            if(!current_asset().is_custom){
+            if(tmp){
                 ImGui::EndDisabled();
             }
 
@@ -260,24 +250,24 @@ void SettingWindow::OnUpdate(float ts) {
 
 void SettingWindow::OnAttach() {
     Layer::OnAttach();
-    _hotkey_capture_thread = std::thread([this]{
-        RegisterHotKey(NULL, 1, MOD_CONTROL | 0X4000, VK_F12) ; // Ctrl F12
-        MSG msg;
-        auto& app = GGgui::Application::Get();
-        while(app.IsRunning()) {
-            if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0) {
-                if (msg.wParam == 1) {
-//                    std::cout << "hot key" << std::endl;
-                    show = !show;
-                }
-            }
-        }
-    });(void)_hotkey_capture_thread;
+//    _hotkey_capture_thread = std::thread([this]{
+//        RegisterHotKey(NULL, 1, MOD_CONTROL | 0X4000, VK_F12) ; // Ctrl F12
+//        MSG msg;
+//        auto& app = GGgui::Application::Get();
+//        while(app.IsRunning()) {
+//            if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0) {
+//                if (msg.wParam == 1) {
+////                    std::cout << "hot key" << std::endl;
+////                    show = !show;
+//                }
+//            }
+//        }
+//    });(void)_hotkey_capture_thread;
 }
 
 void SettingWindow::OnDetach() {
     Layer::OnDetach();
-    if(_hotkey_capture_thread.joinable()) _hotkey_capture_thread.join();
+//    if(_hotkey_capture_thread.joinable()) _hotkey_capture_thread.join();
 }
 
 std::pair<int, int> SettingWindow::get_memory_consumption(){

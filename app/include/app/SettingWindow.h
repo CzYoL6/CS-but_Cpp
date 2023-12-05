@@ -87,7 +87,7 @@ private:
     static SettingWindow* _instance;
     Settings _settings;
     Assets _assets;
-    std::thread _hotkey_capture_thread;
+//    std::thread _hotkey_capture_thread;
     static std::pair<int, int> get_memory_consumption(); // <virtual mem, physical mem> MB
 
 public:

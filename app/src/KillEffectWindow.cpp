@@ -12,6 +12,7 @@
 #include <map>
 #include <windows.h>
 #include <psapi.h>
+#include <app/WindowsFileDialog.h>
 
 KillEffectWindow* KillEffectWindow::_instance = nullptr;
 
@@ -105,7 +106,9 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
         std::vector<std::shared_ptr<EffectImage>> images;
 
         //load kill banner images from disk
-        std::filesystem::path image_folder_of_kill_count = std::format("{}\\{}\\{}kill\\", current_asset.kill_banner_asset_folder, quality == 0 ? "1080p120hz" : "2k120hz", ckc);
+        std::filesystem::path image_folder_of_kill_count =
+                FileDialog::getCanonicalPath(current_asset.kill_banner_asset_folder) /
+                std::format("{}\\{}kill",  quality == 0 ? "1080p120hz" : "2k120hz", ckc);
         if (std::filesystem::exists(image_folder_of_kill_count) &&
             std::filesystem::is_directory(image_folder_of_kill_count)) {
             std::vector<std::filesystem::path> files;
@@ -128,7 +131,9 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
 
     if(current_asset.enable_headshot) {
         //load headshot from disk
-        std::filesystem::path image_folder_of_headshot = std::format("{}\\{}\\", current_asset.headshot_banner_folder, quality == 0 ? "1080p120hz" : "2k120hz");
+        std::filesystem::path image_folder_of_headshot =
+                FileDialog::getCanonicalPath(current_asset.headshot_banner_folder) /
+                std::format("{}", quality == 0 ? "1080p120hz" : "2k120hz");
         if (std::filesystem::exists(image_folder_of_headshot) &&
             std::filesystem::is_directory(image_folder_of_headshot)) {
             std::vector<std::filesystem::path> files;
@@ -212,7 +217,7 @@ void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
     if(!SettingWindow::GetInstance().load_complete) return;
     _image_sequence_player->ResetImageSequence((*_image_buffer_round_kill)[clamped_banner_index - 1]);
     auto &app = GGgui::Application::Get();
-    app.PlayAudio(std::format("{}\\{}kill.wav", current_asset.kill_sound_asset_folder, clamped_audio_index));
+    app.PlayAudio((FileDialog::getCanonicalPath(current_asset.kill_sound_asset_folder) / std::format("{}kill.wav",  clamped_audio_index)).string());
 
     _image_sequence_player->Play();
 }
@@ -221,7 +226,7 @@ void KillEffectWindow::ShowHeadshotEffect() {
     if(!SettingWindow::GetInstance().load_complete) return;
     _image_sequence_player->ResetImageSequence(_image_buffer_headshot);
     auto &app = GGgui::Application::Get();
-    app.PlayAudio(SettingWindow::GetInstance().current_asset().headshot_sound_file);
+    app.PlayAudio(FileDialog::getCanonicalPath(SettingWindow::GetInstance().current_asset().headshot_sound_file).string());
 
     _image_sequence_player->Play();
 }
