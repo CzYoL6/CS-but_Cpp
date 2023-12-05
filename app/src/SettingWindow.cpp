@@ -62,8 +62,8 @@ void SettingWindow::OnUIRender()
             }
             ImGui::PopStyleColor(1);
 
-            ImGui::SameLine();
-            ImGui::Text("Press Ctrl+F12 to show/hide this window.");
+//            ImGui::SameLine();
+//            ImGui::Text("Press Ctrl+F12 to show/hide this window.");
 
             ImGui::Spacing();
             ImGui::Separator();
@@ -87,6 +87,14 @@ void SettingWindow::OnUIRender()
             ImGui::Spacing();
             ImGui::Separator();
             ImGui::Spacing();
+
+            ImGui::Text("Scale");
+            ImGui::Spacing();
+            ImGui::DragFloat("Scale Factor", &_settings.scale_factor, 0.01f, 0.01f, 9.99f);
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
 
             ImGui::Text("Asset Preset");
             ImGui::Spacing();

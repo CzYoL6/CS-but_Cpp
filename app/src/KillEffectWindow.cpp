@@ -31,10 +31,9 @@ void KillEffectWindow::OnUIRender() {
         ImGui::GetWindowViewport()->Flags |= ImGuiViewportFlags_TopMost;
         if(_frame_buffer->gl_texture_id() != 0 && _image_sequence_player->playing()){
             Settings& settings = SettingWindow::GetInstance().settings();
-            float factor =  ImGui::GetWindowWidth() / 
+            float factor =  SettingWindow::GetInstance().settings().scale_factor * ImGui::GetWindowWidth() /
                 ((SettingWindow::GetInstance().settings().asset_quality==0)?1920.0f:3840.0f);
             ImGui::SetCursorPos({ImGui::GetWindowWidth()*0.5f +  - factor*_frame_buffer->image_width()*0.5f + settings.offset_x, ImGui::GetWindowHeight()*0.5f - factor*_frame_buffer->image_height() + settings.offset_y});
-//            std::cout <<ImGui::GetWindowWidth()*0.5f +  - factor*_frame_buffer->image_width()*0.5f + offset_x<<","<<ImGui::GetWindowHeight()*0.5f - factor*_frame_buffer->image_height()*0.5f + offset_y<<'\n';
             ImGui::Image(ImTextureID(_frame_buffer->gl_texture_id()),
                          {factor * _frame_buffer->image_width(), factor * _frame_buffer->image_height()});
         }
