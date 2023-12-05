@@ -46,15 +46,20 @@ private:
     std::shared_ptr<std::vector<std::shared_ptr<std::vector<std::shared_ptr<EffectImage>>>>> _image_buffer_round_kill;
     std::shared_ptr<std::vector<std::shared_ptr<EffectImage>>> _image_buffer_headshot;
     bool _hidden{true};
-    bool _show_effect_sign = false;
-    int _show_effect_count;
-    std::mutex _show_effect_mutex;
+
+    bool _show_round_kill_effect_sign = false;
+    int _show_round_kill_effect_count;
+    std::mutex _show_round_kill_effect_mutex;
+
+    bool _show_headshot_effect_sign = false;
+    std::mutex _show_headshot_effect_mutex;
 
     httplib::Server _http_server;
     std::thread _http_server_thread;
     std::thread _load_assets_thread;
 
-    void queue_show_effect_on_opengl_thread(int count);
+    void queue_show_round_kill_effect_on_opengl_thread(int count);
+    void queue_show_headshot_effect_on_opengl_thread();
 };
 
 

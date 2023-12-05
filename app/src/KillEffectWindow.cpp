@@ -81,10 +81,17 @@ void KillEffectWindow::Show() {
 void KillEffectWindow::OnUpdate(float ts) {
     Layer::OnUpdate(ts);
 //    spdlog::info("timestep: {}s\n", ts);
-    if(_show_effect_sign){
-        std::lock_guard<std::mutex> l(_show_effect_mutex);
-        ShowRoundKillEffect(_show_effect_count);
-        _show_effect_sign = false;
+    if(_show_round_kill_effect_sign){
+        std::lock_guard<std::mutex> l(_show_round_kill_effect_mutex);
+        ShowRoundKillEffect(_show_round_kill_effect_count);
+        _show_round_kill_effect_sign = false;
+    }
+
+    if(_show_headshot_effect_sign){
+        std::lock_guard<std::mutex> l(_show_headshot_effect_mutex);
+        ShowHeadshotEffect();
+        _show_headshot_effect_sign = false;
+
     }
     _image_sequence_player->Update(ts);
 }
@@ -158,6 +165,7 @@ KillEffectWindow::KillEffectWindow() {
 void KillEffectWindow::handle_data(const Json::Value &data) {
     static std::string pre_steamid = "empty";
     static int round_kills = 0;
+    static int round_kills_hs = 0;
     if (data["player"]["steamid"].empty()) return;
     std::string steamid = data["player"]["steamid"].asString();
     if(SettingWindow::GetInstance().settings().only_show_effect_when_im_playing) {
@@ -165,21 +173,35 @@ void KillEffectWindow::handle_data(const Json::Value &data) {
             return;
         }
     }
+
+    if(data["player"]["state"]["round_killhs"].empty()) return;
+    int cur_player_round_kill_hs = data["player"]["state"]["round_killhs"].asInt();
+
     if (data["player"]["state"]["round_kills"].empty()) return;
     int cur_player_round_kill = data["player"]["state"]["round_kills"].asInt();
-    if(steamid != pre_steamid){
+
+    if (steamid != pre_steamid) {
         pre_steamid = steamid;
         round_kills = cur_player_round_kill;
+        round_kills_hs = cur_player_round_kill_hs;
     }
 
+    int delta_round_killhs = cur_player_round_kill_hs - round_kills_hs;
     int delta_round_kill = cur_player_round_kill - round_kills;
 
+    round_kills_hs = cur_player_round_kill_hs;
     round_kills = cur_player_round_kill;
 
-    if (delta_round_kill > 0) {
-        queue_show_effect_on_opengl_thread(cur_player_round_kill);
-    }
 
+    if (delta_round_kill > 0) {
+        if(cur_player_round_kill == 1 && SettingWindow::GetInstance().current_asset().enable_headshot){
+            if(delta_round_killhs > 0){
+                queue_show_headshot_effect_on_opengl_thread();
+                return;
+            }
+        }
+        queue_show_round_kill_effect_on_opengl_thread(cur_player_round_kill);
+    }
 }
 
 void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
@@ -228,10 +250,15 @@ void KillEffectWindow::LoadAssets() {
     });(void)_load_assets_thread;
 }
 
-void KillEffectWindow::queue_show_effect_on_opengl_thread(int count) {
-    std::lock_guard<std::mutex> l(_show_effect_mutex);
-    _show_effect_count = count;
-    _show_effect_sign = true;
+void KillEffectWindow::queue_show_round_kill_effect_on_opengl_thread(int count) {
+    std::lock_guard<std::mutex> l(_show_round_kill_effect_mutex);
+    _show_round_kill_effect_count = count;
+    _show_round_kill_effect_sign = true;
+}
+
+void KillEffectWindow::queue_show_headshot_effect_on_opengl_thread() {
+    std::lock_guard<std::mutex> l(_show_headshot_effect_mutex);
+    _show_headshot_effect_sign = true;
 }
 
 
