@@ -3,9 +3,9 @@
     {
       "asset_name" : "Valorant Default",
       "is_custom" : false,
-      "kill_banner_asset_folder": "Valorant-Default/banner",
+      "kill_banner_asset_folder": "assets/Valorant-Default/banner",
       "max_kill_banner_count" : 5,
-      "kill_sound_asset_folder":  "Valorant-Default/audio",
+      "kill_sound_asset_folder":  "assets/Valorant-Default/audio",
       "max_kill_sound_count" : 5,
       "enable_headshot" : false,
       "headshot_banner_folder": "",

@@ -85,16 +85,15 @@ struct Assets{
         Json::Value assets;
         std::filesystem::path assets_file = "assets/asset_config.json";
         if(std::filesystem::exists(assets_file)){
-            std::fstream file(assets_file);
+            std::ifstream file(assets_file);
             file >> assets;
-
+            file.close();
             for(int i = 0; i < assets["assets"].size(); i++){
                 asset_configs[i].WriteToJson(assets["assets"][i]);
             }
-
-            file << assets;
-
-            file.close();
+            std::ofstream file_(assets_file);
+            file_ << assets;
+            file_.close();
             spdlog::warn("{} assets saved.", assets["assets"].size());
         }
         else{

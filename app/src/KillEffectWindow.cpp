@@ -97,7 +97,7 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
         std::vector<std::shared_ptr<EffectImage>> images;
 
         //load images from disk
-        std::filesystem::path image_folder_of_kill_count = std::format("assets\\{}\\{}\\{}kill\\",  kill_banner_folder, quality==0?"1080p120hz":"2k120hz", ckc);
+        std::filesystem::path image_folder_of_kill_count = std::format("{}\\{}\\{}kill\\",  kill_banner_folder, quality==0?"1080p120hz":"2k120hz", ckc);
         if (std::filesystem::exists(image_folder_of_kill_count) &&
             std::filesystem::is_directory(image_folder_of_kill_count)) {
             std::vector<std::filesystem::path> files;
@@ -164,7 +164,8 @@ void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
     if(!SettingWindow::GetInstance().load_complete) return;
     _image_sequence_player->ResetImageSequence(_image_buffer[round_kill - 1]);
     auto &app = GGgui::Application::Get();
-    app.PlayAudio(std::format("assets\\audio\\{}kill.wav", round_kill));
+    auto &asset = SettingWindow::GetInstance().assets().asset_configs[SettingWindow::GetInstance().settings().asset_preset];
+    app.PlayAudio(std::format("{}\\{}kill.wav", asset.kill_sound_asset_folder,round_kill));
 
     _image_sequence_player->Play();
 }

@@ -5,8 +5,10 @@
 #include <app/KillEffectWindow.h>
 #include<Input/Input.h>
 #include <spdlog/spdlog.h>
+#include <imgui/imgui_stdlib.h>
 #include <windows.h>
 #include <psapi.h>
+#include <app/WindowsFileDialog.h>
 
 SettingWindow* SettingWindow::_instance = nullptr;
 
@@ -71,9 +73,70 @@ void SettingWindow::OnUIRender()
 
             ImGui::Separator();
 
+            AssetConfig& current_asset = _assets.asset_configs[_settings.asset_preset];
             ImGui::Combo("Asset Preset", &_settings.asset_preset,_assets.asset_names, IM_ARRAYSIZE(_assets.asset_names));
+            if(!current_asset.is_custom){
+                ImGui::BeginDisabled();
+            }
+            ImGui::InputText("Asset Name", &current_asset.asset_name);
+            ImGui::BeginDisabled();
+            ImGui::InputText("Kill Banner Folder", &current_asset.kill_banner_asset_folder);
+            ImGui::EndDisabled();
+            ImGui::SameLine();
+            ImGui::PushID(1);
+            if(ImGui::Button("Select")){
+                std::filesystem::path path = openFolderDialog();
+                std::filesystem::path rel_path = std::filesystem::relative(path, std::filesystem::current_path());
+                current_asset.kill_banner_asset_folder = rel_path.string();
+            }
+            ImGui::PopID();
+            ImGui::DragInt("Max Kill Count Of Banner", &current_asset.max_kill_banner_count, 1, 1, 10);
+            ImGui::BeginDisabled();
+            ImGui::InputText("Kill Sound Folder", &current_asset.kill_sound_asset_folder);
+            ImGui::EndDisabled();
+            ImGui::SameLine();
+            ImGui::PushID(2);
+            if(ImGui::Button("Select")){
+                std::filesystem::path path = openFolderDialog();
+                std::filesystem::path rel_path = std::filesystem::relative(path, std::filesystem::current_path());
+                current_asset.kill_sound_asset_folder = rel_path.string();
+            }
+            ImGui::PopID();
+            ImGui::DragInt("Max Kill Count Of Sound", &current_asset.max_kill_sound_count, 1, 1, 10);
+
+            if(!current_asset.is_custom){
+                ImGui::EndDisabled();
+            }
             ImGui::Separator();
 
+            ImGui::Checkbox("Enable Headshot", &current_asset.enable_headshot);
+            if(current_asset.enable_headshot) {
+                ImGui::BeginDisabled();
+                ImGui::InputText("Headshot Banner Folder", &current_asset.headshot_banner_folder);
+                ImGui::EndDisabled();
+
+                ImGui::SameLine();
+                ImGui::PushID(3);
+                if (ImGui::Button("Select")) {
+                    std::filesystem::path path = openFolderDialog();
+                    std::filesystem::path rel_path = std::filesystem::relative(path, std::filesystem::current_path());
+                    current_asset.headshot_banner_folder = rel_path.string();
+                }
+                ImGui::PopID();
+
+                ImGui::BeginDisabled();
+                ImGui::InputText("Headshot Sound Folder", &current_asset.headshot_sound_file);
+                ImGui::EndDisabled();
+
+                ImGui::SameLine();
+                ImGui::PushID(4);
+                if (ImGui::Button("Select")) {
+                    std::filesystem::path path = openFileDialog("All Files\0*.wav\0");
+                    std::filesystem::path rel_path = std::filesystem::relative(path, std::filesystem::current_path());
+                    current_asset.headshot_sound_file = rel_path.string();
+                }
+                ImGui::PopID();
+            }
             ImGui::Text("Asset Quality");
             ImGui::RadioButton("Medium", &_settings.asset_quality, 0);
             ImGui::SameLine();
@@ -91,15 +154,10 @@ void SettingWindow::OnUIRender()
             ImGui::Separator();
             ImGui::Text("Other");
             ImGui::Checkbox("Only show effect when I'm playing(disable when spectating)", &_settings.only_show_effect_when_im_playing);
-            if(!_settings.only_show_effect_when_im_playing)
-                ImGui::BeginDisabled();
-            char steamid[1024];
-            memcpy(steamid, _settings.steamid.c_str(),_settings.steamid.size());
-            steamid[_settings.steamid.size()] = '\0';
-            ImGui::InputText("steamid", steamid, sizeof(steamid));
-            _settings.steamid = steamid;
-            if(!_settings.only_show_effect_when_im_playing)
-                ImGui::EndDisabled();
+            if(_settings.only_show_effect_when_im_playing) {
+                ImGui::InputText("steamid", &_settings.steamid);
+            }
+
 
             //TODO: add volume control
 
