@@ -91,13 +91,14 @@ void KillEffectWindow::OnUpdate(float ts) {
 
 
 
-void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complete, std::string_view kill_banner_folder, int framerate,
+void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complete, const AssetConfig &current_asset, int framerate,
                                              int quality) {
-    for(int ckc = 1; ckc <= _max_continuous_kill_count; ckc++ ) {
+
+    for(int ckc = 1; ckc <= current_asset.max_kill_banner_count; ckc++ ) {
         std::vector<std::shared_ptr<EffectImage>> images;
 
-        //load images from disk
-        std::filesystem::path image_folder_of_kill_count = std::format("{}\\{}\\{}kill\\",  kill_banner_folder, quality==0?"1080p120hz":"2k120hz", ckc);
+        //load kill banner images from disk
+        std::filesystem::path image_folder_of_kill_count = std::format("{}\\{}\\{}kill\\", current_asset.kill_banner_asset_folder, quality == 0 ? "1080p120hz" : "2k120hz", ckc);
         if (std::filesystem::exists(image_folder_of_kill_count) &&
             std::filesystem::is_directory(image_folder_of_kill_count)) {
             std::vector<std::filesystem::path> files;
@@ -112,10 +113,31 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
                 auto &f = files[k];
                 images.push_back(std::make_shared<EffectImage>(f.string()));
             }
-            _image_buffer.push_back(std::make_shared<std::vector<std::shared_ptr<EffectImage>>>(std::move(images)));
+            _image_buffer_round_kill->push_back(std::make_shared<std::vector<std::shared_ptr<EffectImage>>>(std::move(images)));
         }
 
-        *progress += 1.0f / _max_continuous_kill_count;
+        *progress += 1.0f / (current_asset.max_kill_banner_count + (int)current_asset.enable_headshot);
+    }
+
+    if(current_asset.enable_headshot) {
+        //load headshot from disk
+        std::filesystem::path image_folder_of_headshot = std::format("{}\\{}\\", current_asset.headshot_banner_folder, quality == 0 ? "1080p120hz" : "2k120hz");
+        if (std::filesystem::exists(image_folder_of_headshot) &&
+            std::filesystem::is_directory(image_folder_of_headshot)) {
+            std::vector<std::filesystem::path> files;
+            std::string png_ext = ".png";
+            for (auto &f: std::filesystem::directory_iterator(image_folder_of_headshot)) {
+                if (f.path().extension() == png_ext) {
+                    files.push_back(f.path());
+                }
+            }
+            std::sort(files.begin(), files.end());
+            for (int k = 0; k < files.size(); k += (framerate == 0 ? 2 : 1)) {
+                auto &f = files[k];
+                _image_buffer_headshot->push_back(std::make_shared<EffectImage>(f.string()));
+            }
+        }
+        *progress += 1.0f / (current_asset.max_kill_banner_count + (int) current_asset.enable_headshot);
     }
     *load_complete = true;
     spdlog::warn("loading images to memory succeeded.");
@@ -127,6 +149,8 @@ KillEffectWindow::KillEffectWindow() {
     _instance = this;
 
     _frame_buffer = std::make_shared<GGgui::Image>();
+    _image_buffer_round_kill = std::make_shared<std::vector<std::shared_ptr<std::vector<std::shared_ptr<EffectImage>>>>>();
+    _image_buffer_headshot = std::make_shared<std::vector<std::shared_ptr<EffectImage>>>();
     _image_sequence_player = std::make_shared<ImageSequencePlayer>(SettingWindow::GetInstance().settings().framerate==0?60:120, _frame_buffer);
 
 }
@@ -153,19 +177,29 @@ void KillEffectWindow::handle_data(const Json::Value &data) {
     round_kills = cur_player_round_kill;
 
     if (delta_round_kill > 0) {
-        queue_show_effect_on_opengl_thread(cur_player_round_kill > _max_continuous_kill_count ?
-                                           _max_continuous_kill_count : cur_player_round_kill);
+        queue_show_effect_on_opengl_thread(cur_player_round_kill);
     }
 
 }
 
 void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
-    assert(round_kill <= _max_continuous_kill_count);
+    const auto& current_asset = SettingWindow::GetInstance().current_asset();
+    int clamped_banner_index = std::min(round_kill, current_asset.max_kill_banner_count);
+    int clamped_audio_index = std::min(round_kill, current_asset.max_kill_sound_count);
+
     if(!SettingWindow::GetInstance().load_complete) return;
-    _image_sequence_player->ResetImageSequence(_image_buffer[round_kill - 1]);
+    _image_sequence_player->ResetImageSequence((*_image_buffer_round_kill)[clamped_banner_index - 1]);
     auto &app = GGgui::Application::Get();
-    auto &asset = SettingWindow::GetInstance().assets().asset_configs[SettingWindow::GetInstance().settings().asset_preset];
-    app.PlayAudio(std::format("{}\\{}kill.wav", asset.kill_sound_asset_folder,round_kill));
+    app.PlayAudio(std::format("{}\\{}kill.wav", current_asset.kill_sound_asset_folder, clamped_audio_index));
+
+    _image_sequence_player->Play();
+}
+
+void KillEffectWindow::ShowHeadshotEffect() {
+    if(!SettingWindow::GetInstance().load_complete) return;
+    _image_sequence_player->ResetImageSequence(_image_buffer_headshot);
+    auto &app = GGgui::Application::Get();
+    app.PlayAudio(SettingWindow::GetInstance().current_asset().headshot_sound_file);
 
     _image_sequence_player->Play();
 }
@@ -180,16 +214,15 @@ void KillEffectWindow::OnDetach() {
 void KillEffectWindow::LoadAssets() {
     _image_sequence_player->Stop();
     _image_sequence_player->set_framerate(SettingWindow::GetInstance().settings().framerate==0?60:120);
-    _image_buffer.clear();
+    _image_buffer_round_kill->clear();
+    _image_buffer_headshot->clear();
     SettingWindow::GetInstance().assets_load_progress = 0.0f;
     SettingWindow::GetInstance().load_complete = false;
     if(_load_assets_thread.joinable()) _load_assets_thread.join();
     _load_assets_thread = std::thread([this](){
         load_images_from_disk(&SettingWindow::GetInstance().assets_load_progress,
                               &SettingWindow::GetInstance().load_complete,
-                              SettingWindow::GetInstance().assets()
-                                      .asset_configs[SettingWindow::GetInstance().settings().asset_preset]
-                                      .kill_banner_asset_folder,
+                              SettingWindow::GetInstance().current_asset(),
                               SettingWindow::GetInstance().settings().framerate,
                               SettingWindow::GetInstance().settings().asset_quality);
     });(void)_load_assets_thread;
@@ -200,4 +233,6 @@ void KillEffectWindow::queue_show_effect_on_opengl_thread(int count) {
     _show_effect_count = count;
     _show_effect_sign = true;
 }
+
+
 

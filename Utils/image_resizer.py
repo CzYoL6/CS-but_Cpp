@@ -38,10 +38,28 @@ def resize_images(input_folder, output_folder, scale_factor):
             cv2.imwrite(os.path.join(output_folder, file), resized_image)
 
 if __name__ == "__main__":
-    # Specify input and output folders, and scale factor
-    input_folder = "./assets/banner/5kill"
-    output_folder = "./assets/banner/1080p/5kill"
-    scale_factor = 0.5  # Adjust this as needed
+    for i in range(1, 7):
+        # Specify input and output folders, and scale factor
+        input_folder = f"./assets/CF/banner/2k120hz/{i}kill"
+        output_folder = f"./assets/CF/banner/1080p120hz/{i}kill"
+        scale_factor = 0.5  # Adjust this as needed
 
-    # Resize images in the input folder and save them to the output folder
-    resize_images(input_folder, output_folder, scale_factor)
+        # Resize images in the input folder and save them to the output folder
+        resize_images(input_folder, output_folder, scale_factor)
+
+        # Specify input and output folders, and scale factor
+        input_folder = f"./assets/CF/banner/2k120hz/headshot_1"
+        output_folder = f"./assets/CF/banner/1080p120hz/headshot_1"
+        scale_factor = 0.5  # Adjust this as needed
+
+        # Resize images in the input folder and save them to the output folder
+        resize_images(input_folder, output_folder, scale_factor)
+
+
+        # Specify input and output folders, and scale factor
+        input_folder = f"./assets/CF/banner/2k120hz/headshot_2"
+        output_folder = f"./assets/CF/banner/1080p120hz/headshot_2"
+        scale_factor = 0.5  # Adjust this as needed
+
+        # Resize images in the input folder and save them to the output folder
+        resize_images(input_folder, output_folder, scale_factor)

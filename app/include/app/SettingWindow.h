@@ -89,14 +89,13 @@ private:
     Assets _assets;
     std::thread _hotkey_capture_thread;
     static std::pair<int, int> get_memory_consumption(); // <virtual mem, physical mem> MB
-    int add_custom_asset_preset();
-    void delete_custom_asset_preset(int id) ;
 
 public:
     static SettingWindow& GetInstance() {
         assert(_instance != nullptr);
         return *_instance;
     }
+
 public:
     virtual void OnUIRender() override;
     virtual void OnAttach() override;
@@ -105,6 +104,8 @@ public:
 
     Settings& settings() {return _settings;}
     Assets& assets() {return _assets;}
+    AssetConfig& current_asset() { return _assets.asset_configs[_settings.asset_preset];}
+
 public:
     bool show = true;
     float assets_load_progress = 0.0f;
