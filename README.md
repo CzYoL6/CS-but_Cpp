@@ -3,6 +3,7 @@ CS-but-XXX is program that allows you to enjoy kill effects from other games whe
 
 ![](doc/settingwindow.png)
 ![](doc/effect.jpg)
+![](doc/effect2.jpg)
 ## How to Build
 The project can be built with CMake on Windows. All the vendor libraries are included in the project.
 ```
@@ -26,7 +27,7 @@ will come in the future(by change loading method or by loading the texture into 
 ## To Do
 - [ ] add volume control.
 
-- [ ] add size control.
+- [x] add size control.
 
 - [x] improve memory consumption.
 
