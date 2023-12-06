@@ -24,7 +24,7 @@ void SettingWindow::OnUIRender()
     if(show) {
 //        if(true) {
         ImGui::SetNextWindowSize({700, 0});
-        ImGui::Begin("CS but Valorant v1.1", nullptr,
+        ImGui::Begin("CS but Valorant v1.2", nullptr,
                      ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
 //        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, 5);
 //        ImGui::GetWindowViewport()->Flags |= ImGuiViewportFlags_TopMost;
