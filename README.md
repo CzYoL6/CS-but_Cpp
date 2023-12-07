@@ -44,3 +44,4 @@ will come in the future(by change loading method or by loading the texture into 
 - [soloud](https://github.com/jarikomppa/soloud)
 - [spdlog](https://github.com/gabime/spdlog)
 - [stb_image](https://github.com/nothings/stb)
+- [steamworks SDK](https://partner.steamgames.com/doc/sdk)
