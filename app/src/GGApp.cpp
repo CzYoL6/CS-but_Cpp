@@ -2,9 +2,6 @@
 
 #include <gui/Application.h>
 #include <gui/EntryPoint.h>
-#include <GLFW/glfw3.h>
-
-#include <stb_image/stb_image.h>
 #include <app/SettingWindow.h>
 #include <app/KillEffectWindow.h>
 
