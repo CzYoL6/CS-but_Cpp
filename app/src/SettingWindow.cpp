@@ -95,6 +95,12 @@ void SettingWindow::OnUIRender()
             ImGui::Separator();
             ImGui::Spacing();
 
+            ImGui::Text("Volume");
+            ImGui::Spacing();
+            ImGui::SliderFloat("Volume", &_settings.volume, 0.0f, 2.0f);
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
 
             ImGui::Text("Asset Preset");
             ImGui::Spacing();

@@ -28,7 +28,7 @@ struct Settings{
             steamid = setting["steamid"].asString();
             asset_preset = setting["asset_preset"].asInt();
             scale_factor = setting["scale_factor"].asFloat();
-
+            volume = setting["volume"].asFloat();
 
             file.close();
             spdlog::warn("Settings loaded.");
@@ -43,7 +43,8 @@ struct Settings{
                     "only_show_effect_when_im_playing" : false,
                     "steamid" : "",
                     "asset_preset" : 0,
-                    "scale_factor" : 1.0
+                    "scale_factor" : 1.0,
+                    "volume" : 1.0
                     })", setting);
             std::ofstream file(setting_file );
             file << setting;
@@ -66,6 +67,7 @@ struct Settings{
         setting["steamid"] = steamid;
         setting["asset_preset"] = asset_preset;
         setting["scale_factor"] = scale_factor;
+        setting["volume"] = volume;
         std::filesystem::path setting_file = FileDialog::getCanonicalPath("settings.json");
         std::ofstream file(setting_file);
         file << setting;
@@ -84,6 +86,7 @@ struct Settings{
     int asset_preset{0};
 
     float scale_factor{1.0};
+    float volume{1.0};
 };
 
 class SettingWindow : public GGgui::Layer

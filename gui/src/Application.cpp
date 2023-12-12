@@ -393,12 +393,14 @@ namespace GGgui {
         return (float) glfwGetTime();
     }
 
-    void Application::PlayAudio(std::string_view audio_path) {
+    void Application::PlayAudio(std::string_view audio_path, float volume) {
+        assert(volume >= 0.0f && volume <= 2.0f);
+
         auto as = _wav_ass.front();
         _wav_ass.pop();
         _wav_ass.push(as);
 
         as->load(audio_path.data());
-        _soloud_core.play(*as);
+        _soloud_core.play(*as, volume);
     }
 }

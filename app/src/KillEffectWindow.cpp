@@ -216,7 +216,9 @@ void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
     if(!SettingWindow::GetInstance().load_complete) return;
     _image_sequence_player->ResetImageSequence((*_image_buffer_round_kill)[clamped_banner_index - 1]);
     auto &app = GGgui::Application::Get();
-    app.PlayAudio((FileDialog::getCanonicalPath(current_asset.kill_sound_asset_folder) / std::format("{}kill.wav",  clamped_audio_index)).string());
+    app.PlayAudio(
+            (FileDialog::getCanonicalPath(current_asset.kill_sound_asset_folder) / std::format("{}kill.wav",  clamped_audio_index)).string(),
+            SettingWindow::GetInstance().settings().volume);
 
     _image_sequence_player->Play();
 }
@@ -225,7 +227,9 @@ void KillEffectWindow::ShowHeadshotEffect() {
     if(!SettingWindow::GetInstance().load_complete) return;
     _image_sequence_player->ResetImageSequence(_image_buffer_headshot);
     auto &app = GGgui::Application::Get();
-    app.PlayAudio(FileDialog::getCanonicalPath(SettingWindow::GetInstance().current_asset().headshot_sound_file).string());
+    app.PlayAudio(
+            FileDialog::getCanonicalPath(SettingWindow::GetInstance().current_asset().headshot_sound_file).string(),
+            SettingWindow::GetInstance().settings().volume);
 
     _image_sequence_player->Play();
 }
