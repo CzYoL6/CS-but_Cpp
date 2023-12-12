@@ -25,7 +25,7 @@ Currently, all the assets(2k120fps/2k60fps/1080p120fps/1080p60fps) will be loade
 will come in the future(by change loading method or by loading the texture into GPU).
 
 ## To Do
-- [ ] add volume control.
+- [x] add volume control.
 
 - [x] add size control.
 
