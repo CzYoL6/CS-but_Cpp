@@ -42,9 +42,13 @@ void SettingWindow::OnUIRender()
             }
 
             static int test_kill_count = 1;
-            ImGui::DragInt("Test Kill Count", &test_kill_count, 1, 1, 100);
+            const int max_kill_count = std::min(SettingWindow::current_asset().max_kill_sound_count, SettingWindow::current_asset().max_kill_banner_count);
+            ImGui::DragInt("Test Kill Count", &test_kill_count, 1, 1, max_kill_count);
             if (ImGui::Button("Test Kill")) {
                 KillEffectWindow::GetInstance().ShowRoundKillEffect(test_kill_count);
+                if((++test_kill_count) == max_kill_count + 1){
+                    test_kill_count = 1;
+                }
             }
             ImGui::SameLine();
             if(current_asset().enable_headshot) {
