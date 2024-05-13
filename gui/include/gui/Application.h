@@ -56,6 +56,8 @@ namespace GGgui {
     private:
         void Init();
         void Shutdown();
+        void SetupStyle(bool dark, float alpha);
+
     private:
         ApplicationSpecification m_Specification;
         GLFWwindow* m_WindowHandle = nullptr;
