@@ -7,6 +7,8 @@
 #include <string_view>
 #include <cstdint>
 #include <stb_image/stb_image.h>
+#include <winsock2.h>
+#include <windows.h>
 #include <GL/gl.h>
 
 namespace GGgui {

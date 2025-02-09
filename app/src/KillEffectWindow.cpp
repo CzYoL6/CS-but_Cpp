@@ -13,6 +13,7 @@
 #include <windows.h>
 #include <psapi.h>
 #include <app/WindowsFileDialog.h>
+#include <algorithm>
 
 KillEffectWindow* KillEffectWindow::_instance = nullptr;
 
@@ -210,8 +211,8 @@ void KillEffectWindow::handle_data(const Json::Value &data) {
 
 void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
     const auto& current_asset = SettingWindow::GetInstance().current_asset();
-    int clamped_banner_index = std::min(round_kill, current_asset.max_kill_banner_count);
-    int clamped_audio_index = std::min(round_kill, current_asset.max_kill_sound_count);
+    int clamped_banner_index = min(round_kill, current_asset.max_kill_banner_count);
+    int clamped_audio_index = min(round_kill, current_asset.max_kill_sound_count);
 
     if(!SettingWindow::GetInstance().load_complete) return;
     _image_sequence_player->ResetImageSequence((*_image_buffer_round_kill)[clamped_banner_index - 1]);

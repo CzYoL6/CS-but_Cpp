@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <string>
 #include <shlobj.h>
+#include <commdlg.h>
 #include <memory>
 #include <filesystem>
 
