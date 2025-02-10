@@ -86,6 +86,22 @@ void SettingWindow::OnUIRender()
                 {
 					ImGui::Spacing();
 					ImGui::BeginChild("kill banner", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() + 10), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+						
+						static bool was_kill_banner_enabled = true;
+						static bool kill_banner_enabled = true;
+						ImGui::Checkbox(kill_banner_enabled ? "Enabled" : "Disabled", &kill_banner_enabled);
+						if (kill_banner_enabled != was_kill_banner_enabled) {
+							// TODO: Save config
+							if (kill_banner_enabled) {
+								KillEffectWindow::GetInstance().Show();
+							}
+							else {
+								KillEffectWindow::GetInstance().Hide();
+							}
+
+							was_kill_banner_enabled = kill_banner_enabled;
+						}
+
 						ImGui::Text("Offset");
 						ImGui::Spacing();
 						ImGui::DragInt("Offset X", &_settings.offset_x);
