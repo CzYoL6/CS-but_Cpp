@@ -82,10 +82,10 @@ void SettingWindow::OnUIRender()
 
             if (ImGui::BeginTabBar("##Tabs2", ImGuiTabBarFlags_None)) {
                 
-                if (ImGui::BeginTabItem("Settings"))
+                if (ImGui::BeginTabItem("Kill Banner"))
                 {
 					ImGui::Spacing();
-					ImGui::BeginChild("settings", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() + 10), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+					ImGui::BeginChild("kill banner", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() + 10), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 						ImGui::Text("Offset");
 						ImGui::Spacing();
 						ImGui::DragInt("Offset X", &_settings.offset_x);
@@ -101,7 +101,13 @@ void SettingWindow::OnUIRender()
 						ImGui::Spacing();
 						ImGui::Separator();
 						ImGui::Spacing();
-
+					ImGui::EndChild();
+					ImGui::EndTabItem();
+                }
+				if (ImGui::BeginTabItem("Sound"))
+                {
+					ImGui::Spacing();
+					ImGui::BeginChild("sound", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() + 10), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 						ImGui::Text("Volume");
 						ImGui::Spacing();
 						ImGui::SliderFloat("Volume", &_settings.volume, 0.0f, 2.0f);
