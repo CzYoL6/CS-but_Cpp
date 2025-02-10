@@ -53,6 +53,7 @@ namespace GGgui {
         GLFWwindow* GetWindowHandle() const { return m_WindowHandle; }
         bool IsRunning() const { return m_Running; }
 
+        void ReinitAudioDevice();
         void ListAudioDevices(std::vector<std::string>& out_audio_devices);
         void SetAudioDevices(const int& audio_device_index);
         void PlayAudio(std::string_view  audio_path, float volume);

@@ -125,40 +125,9 @@ void SettingWindow::OnUIRender()
                 {
 					ImGui::Spacing();
 					ImGui::BeginChild("sound", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() + 10), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-						static std::string current_audio_device = "System Default";
-						static int current_audio_device_index = -1;
-						static std::vector<std::string> audio_devices;
-						static bool init_list_ad = false;
-
-						if (ImGui::Button("Refresh") || !init_list_ad) {
-							init_list_ad = true;
+						if (ImGui::Button("Reinit Audio Device") ) {
 							GGgui::Application& app = GGgui::Application::Get();
-							app.ListAudioDevices(audio_devices);	
-						}
-						ImGui::SameLine();
-
-						if (ImGui::BeginCombo("Audio Device Combo", current_audio_device.c_str())) {
-							ImGui::PushID((void*)"System Default");
-							if (ImGui::Selectable("System Default", current_audio_device_index == -1)) {
-								current_audio_device = "System Default";
-								current_audio_device_index = -1;
-								app.SetAudioDevices(-1);
-								spdlog::warn("Setting audio device to System Default.");
-							}
-							ImGui::PopID();
-
-							for (int adindex = 0; adindex < audio_devices.size(); adindex++) {
-								const std::string& audio_device = audio_devices[adindex];
-								ImGui::PushID((void*)audio_device.c_str());
-								if (ImGui::Selectable(audio_device.c_str(), current_audio_device_index == adindex)) {
-									current_audio_device = audio_device;
-									current_audio_device_index = adindex;
-									app.SetAudioDevices(adindex);
-									spdlog::warn("Setting audio device to {}.", audio_device);
-								}
-								ImGui::PopID();
-							}
-							ImGui::EndCombo();
+							app.ReinitAudioDevice();	
 						}
 
 						ImGui::Spacing();

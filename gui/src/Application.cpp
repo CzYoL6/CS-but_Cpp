@@ -412,7 +412,13 @@ namespace GGgui {
         return (float) glfwGetTime();
     }
 
-    void Application::ListAudioDevices(std::vector<std::string>& out_audio_devices)
+	void Application::ReinitAudioDevice()
+	{
+        _soloud_core.deinit();
+        _soloud_core.init();
+	}
+
+	void Application::ListAudioDevices(std::vector<std::string>& out_audio_devices)
     {
         out_audio_devices.clear();
 
