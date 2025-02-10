@@ -120,7 +120,7 @@ public:
     AssetConfig& current_asset() { return _assets.asset_configs[_settings.asset_preset];}
 
 public:
-    bool show = true;
+    bool bShow = true;
     float assets_load_progress = 0.0f;
     bool load_complete = false;
 };
