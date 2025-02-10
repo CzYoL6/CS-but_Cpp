@@ -215,24 +215,32 @@ void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
     int clamped_audio_index = min(round_kill, current_asset.max_kill_sound_count);
 
     if(!SettingWindow::GetInstance().load_complete) return;
-    _image_sequence_player->ResetImageSequence((*_image_buffer_round_kill)[clamped_banner_index - 1]);
+
+    if (SettingWindow::GetInstance().settings().kill_banner_enabled) {
+        _image_sequence_player->ResetImageSequence((*_image_buffer_round_kill)[clamped_banner_index - 1]);
+		_image_sequence_player->Play();
+    }
+
     auto &app = GGgui::Application::Get();
     app.PlayAudio(
             (FileDialog::getCanonicalPath(current_asset.kill_sound_asset_folder) / std::format("{}kill.wav",  clamped_audio_index)).string(),
             SettingWindow::GetInstance().settings().volume);
 
-    _image_sequence_player->Play();
 }
 
 void KillEffectWindow::ShowHeadshotEffect() {
     if(!SettingWindow::GetInstance().load_complete) return;
-    _image_sequence_player->ResetImageSequence(_image_buffer_headshot);
+
+    if (SettingWindow::GetInstance().settings().kill_banner_enabled) {
+        _image_sequence_player->ResetImageSequence(_image_buffer_headshot);
+		_image_sequence_player->Play();
+    }
+
     auto &app = GGgui::Application::Get();
     app.PlayAudio(
             FileDialog::getCanonicalPath(SettingWindow::GetInstance().current_asset().headshot_sound_file).string(),
             SettingWindow::GetInstance().settings().volume);
 
-    _image_sequence_player->Play();
 }
 
 void KillEffectWindow::OnDetach() {
@@ -250,12 +258,18 @@ void KillEffectWindow::LoadAssets() {
     SettingWindow::GetInstance().assets_load_progress = 0.0f;
     SettingWindow::GetInstance().load_complete = false;
     if(_load_assets_thread.joinable()) _load_assets_thread.join();
-    _load_assets_thread = std::thread([this](){
-        load_images_from_disk(&SettingWindow::GetInstance().assets_load_progress,
-                              &SettingWindow::GetInstance().load_complete,
-                              SettingWindow::GetInstance().current_asset(),
-                              SettingWindow::GetInstance().settings().framerate,
-                              SettingWindow::GetInstance().settings().asset_quality);
+    _load_assets_thread = std::thread([this]() {
+        if (SettingWindow::GetInstance().settings().kill_banner_enabled) {
+            load_images_from_disk(&SettingWindow::GetInstance().assets_load_progress,
+                &SettingWindow::GetInstance().load_complete,
+                SettingWindow::GetInstance().current_asset(),
+                SettingWindow::GetInstance().settings().framerate,
+                SettingWindow::GetInstance().settings().asset_quality);
+        }
+        else {
+			SettingWindow::GetInstance().assets_load_progress = 100.0f;
+			SettingWindow::GetInstance().load_complete = true;
+        }
     });(void)_load_assets_thread;
 }
 

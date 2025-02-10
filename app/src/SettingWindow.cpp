@@ -92,10 +92,13 @@ void SettingWindow::OnUIRender()
 						if (_settings.kill_banner_enabled != was_kill_banner_enabled) {
 							if (_settings.kill_banner_enabled) {
 								KillEffectWindow::GetInstance().Show();
+								spdlog::warn("Kill banner enabled.");
 							}
 							else {
 								KillEffectWindow::GetInstance().Hide();
+								spdlog::warn("Kill banner disabled.");
 							}
+							reload = true;
 
 							was_kill_banner_enabled = _settings.kill_banner_enabled;
 						}
