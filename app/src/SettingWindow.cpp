@@ -103,6 +103,10 @@ void SettingWindow::OnUIRender()
 							was_kill_banner_enabled = _settings.kill_banner_enabled;
 						}
 
+						ImGui::Spacing();
+						ImGui::Separator();
+						ImGui::Spacing();
+
 						ImGui::Text("Offset");
 						ImGui::Spacing();
 						ImGui::DragInt("Offset X", &_settings.offset_x);
