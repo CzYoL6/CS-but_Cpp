@@ -52,11 +52,16 @@ namespace GGgui {
         float GetSmoothedFps(){return m_SmoothedFps;}
         GLFWwindow* GetWindowHandle() const { return m_WindowHandle; }
         bool IsRunning() const { return m_Running; }
+
+        void ReinitAudioDevice();
+        void ListAudioDevices(std::vector<std::string>& out_audio_devices);
+        void SetAudioDevices(const int& audio_device_index);
         void PlayAudio(std::string_view  audio_path, float volume);
     private:
         void Init();
         void Shutdown();
         void SetupStyle(bool dark, float alpha);
+        std::string WideToUTF8(const std::wstring& wstr);
 
     private:
         ApplicationSpecification m_Specification;

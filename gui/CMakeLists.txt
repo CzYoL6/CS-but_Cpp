@@ -9,6 +9,6 @@ target_link_libraries(GGgui PUBLIC opengl32)
 target_link_libraries(GGgui PUBLIC soloud)
 target_link_libraries(GGgui PUBLIC httplib)
 target_link_libraries(GGgui PUBLIC glu32)
-
+target_link_libraries(GGgui PUBLIC ole32 Mmdevapi)
 
 target_include_directories(GGgui PUBLIC include)

@@ -129,6 +129,15 @@ void SettingWindow::OnUIRender()
                 {
 					ImGui::Spacing();
 					ImGui::BeginChild("sound", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() + 10), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+						if (ImGui::Button("Reinit Audio Device") ) {
+							GGgui::Application& app = GGgui::Application::Get();
+							app.ReinitAudioDevice();	
+						}
+
+						ImGui::Spacing();
+						ImGui::Separator();
+						ImGui::Spacing();
+
 						ImGui::Text("Volume");
 						ImGui::Spacing();
 						ImGui::SliderFloat("Volume", &_settings.volume, 0.0f, 2.0f);

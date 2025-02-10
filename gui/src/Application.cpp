@@ -14,9 +14,15 @@
 #include <glm/glm.hpp>
 #include <stb_image/stb_image.h>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
 #include <soloud_wav.h>
 #include <conio.h>
-#include <Windows.h>
+#include <windows.h>
+#include <mmdeviceapi.h>
+#include <audioclient.h>
+#include <functiondiscoverykeys.h>
+#include <locale>
+#include <codecvt>
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -121,6 +127,14 @@ namespace GGgui {
     }
 
     void Application::Init() {
+        // Set locale to support UTF-8
+		//std::locale::global(std::locale("en_US.UTF-8"));
+
+        // init logger
+        auto logger = spdlog::basic_logger_mt("file_logger", "logs.txt");
+        spdlog::set_default_logger(logger);
+
+        // init soloud
         _soloud_core.init();
         for(int i = 0; i < 5; i++){
             _wav_ass.emplace(std::make_shared<SoLoud::Wav>());
@@ -211,9 +225,12 @@ namespace GGgui {
         // Load default font
         ImFontConfig fontConfig;
         fontConfig.FontDataOwnedByAtlas = false;
-        ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF((void *) g_RobotoRegular, sizeof(g_RobotoRegular), 15.0f,
+        /*ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF((void *) g_RobotoRegular, sizeof(g_RobotoRegular), 15.0f,
                                                             &fontConfig);
-        io.FontDefault = robotoFont;
+        io.FontDefault = robotoFont;*/
+
+        io.Fonts->AddFontFromFileTTF("NotoSansCJKtc-Regular.otf", 20.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
+
 
         // Load Fonts
         // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
@@ -395,7 +412,58 @@ namespace GGgui {
         return (float) glfwGetTime();
     }
 
-    void Application::PlayAudio(std::string_view audio_path, float volume) {
+	void Application::ReinitAudioDevice()
+	{
+        _soloud_core.deinit();
+        _soloud_core.init();
+	}
+
+	void Application::ListAudioDevices(std::vector<std::string>& out_audio_devices)
+    {
+        out_audio_devices.clear();
+
+        CoInitialize(NULL);
+        IMMDeviceEnumerator* enumerator = NULL;
+        CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&enumerator);
+
+        IMMDeviceCollection* devices = NULL;
+        enumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &devices);
+
+        UINT count;
+        devices->GetCount(&count);
+
+        for (UINT i = 0; i < count; i++) {
+            IMMDevice* device;
+            devices->Item(i, &device);
+
+            IPropertyStore* props;
+            device->OpenPropertyStore(STGM_READ, &props);
+
+            PROPVARIANT varName;
+            PropVariantInit(&varName);
+            props->GetValue(PKEY_Device_FriendlyName, &varName);
+
+            std::string deviceName = WideToUTF8(varName.pwszVal);
+            spdlog::info("Get device {}: {}", i, deviceName);
+            out_audio_devices.push_back(deviceName);
+
+            PropVariantClear(&varName);
+            props->Release();
+            device->Release();
+        }
+
+        devices->Release();
+        enumerator->Release();
+        CoUninitialize();
+    }
+
+	void Application::SetAudioDevices(const int& audio_device_index)
+	{
+        // TODO: soloud does not provide api to change audio device.
+        _soloud_core.init();
+	}
+
+	void Application::PlayAudio(std::string_view audio_path, float volume) {
         assert(volume >= 0.0f && volume <= 2.0f);
 
         auto as = _wav_ass.front();
@@ -490,4 +558,11 @@ namespace GGgui {
             }
         }
     }
+
+	std::string Application::WideToUTF8(const std::wstring& wstr)
+	{
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+		return converter.to_bytes(wstr);
+	}
+
 }
