@@ -29,6 +29,7 @@ struct Settings{
             asset_preset = setting["asset_preset"].asInt();
             scale_factor = setting["scale_factor"].asFloat();
             volume = setting["volume"].asFloat();
+            kill_banner_enabled = setting["kill_banner_enabled"].asBool();
 
             file.close();
             spdlog::warn("Settings loaded.");
@@ -44,7 +45,8 @@ struct Settings{
                     "steamid" : "",
                     "asset_preset" : 0,
                     "scale_factor" : 1.0,
-                    "volume" : 1.0
+                    "volume" : 1.0,
+                    "kill_banner_enabled" : true,
                     })", setting);
             std::ofstream file(setting_file );
             file << setting;
@@ -68,6 +70,7 @@ struct Settings{
         setting["asset_preset"] = asset_preset;
         setting["scale_factor"] = scale_factor;
         setting["volume"] = volume;
+        setting["kill_banner_enabled"] = kill_banner_enabled;
         std::filesystem::path setting_file = FileDialog::getCanonicalPath("settings.json");
         std::ofstream file(setting_file);
         file << setting;
@@ -87,6 +90,8 @@ struct Settings{
 
     float scale_factor{1.0};
     float volume{1.0};
+
+    bool kill_banner_enabled{ 1 };
 };
 
 class SettingWindow : public GGgui::Layer
