@@ -9,13 +9,50 @@
 #include <windows.h>
 #include <psapi.h>
 #include <app/WindowsFileDialog.h>
+#include <filesystem>
+#include <vdf_parser.hpp>
 
 SettingWindow* SettingWindow::_instance = nullptr;
 
+std::optional<std::string> SettingWindow::GetSteamInstallDir()
+{
+	auto path = ReadRegistryString(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Valve\\Steam", "InstallPath");
+	if (path.has_value()) {
+		return path;
+	}
+	return std::nullopt;
+}
+
+std::optional<std::string> SettingWindow::GetCS2InstallDir()
+{
+	auto steam_install_dir = GetSteamInstallDir();
+	if (steam_install_dir.has_value()) {
+		const std::string library_folders = steam_install_dir.value() + "\\config\\libraryfolders.vdf";
+		if (std::filesystem::exists(library_folders)) {
+			std::ifstream file(library_folders);
+			const auto& root = tyti::vdf::read(file);
+			for (const auto& child_kv : root.childs) {
+				const std::string& lib_dir = child_kv.second->attribs["path"];
+				const auto& app_list = child_kv.second->childs["apps"];
+				for (const auto& app_kv : app_list->attribs) {
+					const std::string& app_id = app_kv.first;
+					if (app_id == "730") {
+						const std::string cs_appmanifest_path = lib_dir + "\\steamapps\\appmanifest_730.acf";
+						std::ifstream cs_appmanifest_file(cs_appmanifest_path);
+						auto root_manifest = tyti::vdf::read(cs_appmanifest_file);
+						const std::string install_dir = root_manifest.attribs["installdir"];
+						const std::string full_cs_install_dir = lib_dir + "\\steamapps\\common\\" + install_dir;
+						return full_cs_install_dir;
+					}
+				}
+			}
+		}
+	}
+	return std::nullopt;
+}
+
 void SettingWindow::OnUIRender()
 {
-
-
     auto& app = GGgui::Application::Get();
 
     if(bShow) {
@@ -34,6 +71,16 @@ void SettingWindow::OnUIRender()
 
 			ImGui::Text("System");
 			if (ImGui::BeginTabBar("##Tabs1", ImGuiTabBarFlags_None)) {
+				if (ImGui::BeginTabItem("GSI")) {
+					ImGui::Spacing();
+					ImGui::BeginChild("gsi", ImVec2(0, 100), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+						if (ImGui::Button("A")) {
+							GetCS2InstallDir();
+						}
+						ImGui::InputText("Config Name", &_settings.gsi_cfg_name);
+					ImGui::EndChild();
+					ImGui::EndTabItem();
+				}
 				if (ImGui::BeginTabItem("Monitor"))
                 {
 					ImGui::Spacing();
@@ -353,4 +400,19 @@ std::pair<int, int> SettingWindow::get_memory_consumption(){
         spdlog::error("Error getting process memory information. Error code: {}",GetLastError() );
         exit(-1);
     }
+}
+
+std::optional<std::string> SettingWindow::ReadRegistryString(HKEY hKeyRoot, const std::string& subKey, const std::string& valueName)
+{
+    HKEY hKey;
+    char value[512];
+    DWORD value_length = sizeof(value);
+    if (RegOpenKeyExA(hKeyRoot, subKey.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        if (RegQueryValueExA(hKey, valueName.c_str(), NULL, NULL, (LPBYTE)value, &value_length) == ERROR_SUCCESS) {
+            RegCloseKey(hKey);
+            return std::string(value);
+        }
+        RegCloseKey(hKey);
+    }
+    return std::nullopt;
 }

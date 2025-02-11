@@ -12,6 +12,8 @@
 #include <spdlog/spdlog.h>
 #include <app/Asset.h>
 #include <app/WindowsFileDialog.h>
+#include <optional>
+
 struct Settings{
     Settings(){
         Json::Value setting;
@@ -30,6 +32,7 @@ struct Settings{
             scale_factor = setting["scale_factor"].asFloat();
             volume = setting["volume"].asFloat();
             kill_banner_enabled = setting["kill_banner_enabled"].asBool();
+            gsi_cfg_name = setting["gsi_cfg_name"].asString();
 
             file.close();
             spdlog::warn("Settings loaded.");
@@ -47,6 +50,7 @@ struct Settings{
                     "scale_factor" : 1.0,
                     "volume" : 1.0,
                     "kill_banner_enabled" : true,
+                    "gsi_cfg_name": "gamestate_integration_cs2.cfg"
                     })", setting);
             std::ofstream file(setting_file );
             file << setting;
@@ -71,6 +75,7 @@ struct Settings{
         setting["scale_factor"] = scale_factor;
         setting["volume"] = volume;
         setting["kill_banner_enabled"] = kill_banner_enabled;
+        setting["gsi_cfg_name"] = gsi_cfg_name;
         std::filesystem::path setting_file = FileDialog::getCanonicalPath("settings.json");
         std::ofstream file(setting_file);
         file << setting;
@@ -92,6 +97,7 @@ struct Settings{
     float volume{1.0};
 
     bool kill_banner_enabled{ 1 };
+    std::string gsi_cfg_name{ "gamestate_integration_cs2.cfg" };
 };
 
 class SettingWindow : public GGgui::Layer
@@ -108,11 +114,16 @@ private:
 //    std::thread _hotkey_capture_thread;
     static std::pair<int, int> get_memory_consumption(); // <virtual mem, physical mem> MB
 
+    std::optional<std::string> ReadRegistryString(HKEY hKeyRoot, const std::string& subKey, const std::string& valueName);
+
 public:
     static SettingWindow& GetInstance() {
         assert(_instance != nullptr);
         return *_instance;
     }
+
+    std::optional<std::string> GetSteamInstallDir();
+    std::optional<std::string> GetCS2InstallDir();
 
 public:
     virtual void OnUIRender() override;
