@@ -32,7 +32,7 @@ void SettingWindow::OnUIRender()
                 KillEffectWindow::GetInstance().Show();
             }
 
-
+			ImGui::Text("System");
 			if (ImGui::BeginTabBar("##Tabs1", ImGuiTabBarFlags_None)) {
 				if (ImGui::BeginTabItem("Monitor"))
                 {
@@ -71,6 +71,18 @@ void SettingWindow::OnUIRender()
 					ImGui::EndChild();
 					ImGui::EndTabItem();
 				}
+				if (ImGui::BeginTabItem("Other")) {
+					ImGui::Spacing();
+					ImGui::BeginChild("presets", ImVec2(0, 100), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
+						ImGui::Checkbox("Only show effect when I'm playing(disable when spectating)", &_settings.only_show_effect_when_im_playing);
+						if(_settings.only_show_effect_when_im_playing) {
+							ImGui::InputText("steamid", &_settings.steamid);
+						}
+					
+					ImGui::EndChild();
+					ImGui::EndTabItem();
+				}
 				ImGui::EndTabBar();
 			}
 
@@ -79,72 +91,8 @@ void SettingWindow::OnUIRender()
             ImGui::Separator();
             ImGui::Spacing();
             
-
+			ImGui::Text("Effect");
             if (ImGui::BeginTabBar("##Tabs2", ImGuiTabBarFlags_None)) {
-                
-                if (ImGui::BeginTabItem("Kill Banner"))
-                {
-					ImGui::Spacing();
-					ImGui::BeginChild("kill banner", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() + 10), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-						
-						static bool was_kill_banner_enabled = true;
-						ImGui::Checkbox(_settings.kill_banner_enabled ? "Enabled" : "Disabled", &_settings.kill_banner_enabled);
-						if (_settings.kill_banner_enabled != was_kill_banner_enabled) {
-							if (_settings.kill_banner_enabled) {
-								KillEffectWindow::GetInstance().Show();
-								spdlog::warn("Kill banner enabled.");
-							}
-							else {
-								KillEffectWindow::GetInstance().Hide();
-								spdlog::warn("Kill banner disabled.");
-							}
-							reload = true;
-
-							was_kill_banner_enabled = _settings.kill_banner_enabled;
-						}
-
-						ImGui::Spacing();
-						ImGui::Separator();
-						ImGui::Spacing();
-
-						ImGui::Text("Offset");
-						ImGui::Spacing();
-						ImGui::DragInt("Offset X", &_settings.offset_x);
-						ImGui::DragInt("Offset Y", &_settings.offset_y);
-
-						ImGui::Spacing();
-						ImGui::Separator();
-						ImGui::Spacing();
-
-						ImGui::Text("Scale");
-						ImGui::Spacing();
-						ImGui::DragFloat("Scale Factor", &_settings.scale_factor, 0.01f, 0.01f, 9.99f);
-						ImGui::Spacing();
-						ImGui::Separator();
-						ImGui::Spacing();
-					ImGui::EndChild();
-					ImGui::EndTabItem();
-                }
-				if (ImGui::BeginTabItem("Sound"))
-                {
-					ImGui::Spacing();
-					ImGui::BeginChild("sound", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() + 10), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-						if (ImGui::Button("Reinit Audio Device") ) {
-							GGgui::Application& app = GGgui::Application::Get();
-							app.ReinitAudioDevice();	
-						}
-
-						ImGui::Spacing();
-						ImGui::Separator();
-						ImGui::Spacing();
-
-						ImGui::Text("Volume");
-						ImGui::Spacing();
-						ImGui::SliderFloat("Volume", &_settings.volume, 0.0f, 2.0f);
-
-					ImGui::EndChild();
-					ImGui::EndTabItem();
-                }
 				if (ImGui::BeginTabItem("Presets"))
                 {
 					ImGui::Spacing();
@@ -274,18 +222,71 @@ void SettingWindow::OnUIRender()
 					ImGui::EndChild();
 					ImGui::EndTabItem();
                 }
-				if (ImGui::BeginTabItem("Other")) {
+                if (ImGui::BeginTabItem("Kill Banner"))
+                {
 					ImGui::Spacing();
-					ImGui::BeginChild("presets", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() + 10), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+					ImGui::BeginChild("kill banner", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() + 10), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+						
+						static bool was_kill_banner_enabled = true;
+						ImGui::Checkbox(_settings.kill_banner_enabled ? "Enabled" : "Disabled", &_settings.kill_banner_enabled);
+						if (_settings.kill_banner_enabled != was_kill_banner_enabled) {
+							if (_settings.kill_banner_enabled) {
+								KillEffectWindow::GetInstance().Show();
+								spdlog::warn("Kill banner enabled.");
+							}
+							else {
+								KillEffectWindow::GetInstance().Hide();
+								spdlog::warn("Kill banner disabled.");
+							}
+							reload = true;
 
-						ImGui::Checkbox("Only show effect when I'm playing(disable when spectating)", &_settings.only_show_effect_when_im_playing);
-						if(_settings.only_show_effect_when_im_playing) {
-							ImGui::InputText("steamid", &_settings.steamid);
+							was_kill_banner_enabled = _settings.kill_banner_enabled;
 						}
-					
+
+						ImGui::Spacing();
+						ImGui::Separator();
+						ImGui::Spacing();
+
+						ImGui::Text("Offset");
+						ImGui::Spacing();
+						ImGui::DragInt("Offset X", &_settings.offset_x);
+						ImGui::DragInt("Offset Y", &_settings.offset_y);
+
+						ImGui::Spacing();
+						ImGui::Separator();
+						ImGui::Spacing();
+
+						ImGui::Text("Scale");
+						ImGui::Spacing();
+						ImGui::DragFloat("Scale Factor", &_settings.scale_factor, 0.01f, 0.01f, 9.99f);
+						ImGui::Spacing();
+						ImGui::Separator();
+						ImGui::Spacing();
 					ImGui::EndChild();
 					ImGui::EndTabItem();
-				}
+                }
+				if (ImGui::BeginTabItem("Sound"))
+                {
+					ImGui::Spacing();
+					ImGui::BeginChild("sound", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() + 10), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+						if (ImGui::Button("Reinit Audio Device") ) {
+							GGgui::Application& app = GGgui::Application::Get();
+							app.ReinitAudioDevice();	
+						}
+
+						ImGui::Spacing();
+						ImGui::Separator();
+						ImGui::Spacing();
+
+						ImGui::Text("Volume");
+						ImGui::Spacing();
+						ImGui::SliderFloat("Volume", &_settings.volume, 0.0f, 2.0f);
+
+					ImGui::EndChild();
+					ImGui::EndTabItem();
+                }
+				
+				
 
                 ImGui::EndTabBar();
             }
