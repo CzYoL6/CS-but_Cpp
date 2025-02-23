@@ -8,8 +8,6 @@
 #include <gui/Application.h>
 #include <json/json.h>
 #include <fstream>
-#include <thread>
-#include <spdlog/spdlog.h>
 #include <app/Asset.h>
 #include <app/WindowsFileDialog.h>
 #include <optional>
@@ -35,7 +33,6 @@ struct Settings{
             gsi_cfg_name = setting["gsi_cfg_name"].asString();
 
             file.close();
-            spdlog::warn("Settings loaded.");
         }
         else{
             Json::Reader reader;
@@ -55,7 +52,6 @@ struct Settings{
             std::ofstream file(setting_file );
             file << setting;
             file.close();
-            spdlog::warn("No settings file found, new one created.");
         }
     }
 
@@ -80,8 +76,6 @@ struct Settings{
         std::ofstream file(setting_file);
         file << setting;
         file.close();
-        spdlog::warn("Settings saved.");
-
     }
 
     int offset_x{0};

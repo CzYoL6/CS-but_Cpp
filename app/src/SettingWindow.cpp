@@ -4,13 +4,13 @@
 #include <app/SettingWindow.h>
 #include <app/KillEffectWindow.h>
 #include<Input/Input.h>
-#include <spdlog/spdlog.h>
 #include <imgui/imgui_stdlib.h>
 #include <windows.h>
 #include <psapi.h>
 #include <app/WindowsFileDialog.h>
 #include <filesystem>
 #include <vdf_parser.hpp>
+#include <format>
 
 SettingWindow* SettingWindow::_instance = nullptr;
 
@@ -211,7 +211,6 @@ void SettingWindow::OnUIRender()
 						bool tmp = !current_asset().is_custom;
 						if(tmp) ImGui::BeginDisabled();
 						if(ImGui::Button("Delete")){
-							spdlog::info("Delete Asset Preset \"{}\".", current_asset().asset_name);
 							_assets.asset_configs.erase(_assets.asset_configs.begin() + _settings.asset_preset);
 							_settings.asset_preset = 0;
 							_assets.ReassignAssetNames();
@@ -329,11 +328,9 @@ void SettingWindow::OnUIRender()
 						if (_settings.kill_banner_enabled != was_kill_banner_enabled) {
 							if (_settings.kill_banner_enabled) {
 								KillEffectWindow::GetInstance().Show();
-								spdlog::warn("Kill banner enabled.");
 							}
 							else {
 								KillEffectWindow::GetInstance().Hide();
-								spdlog::warn("Kill banner disabled.");
 							}
 							reload = true;
 
@@ -403,7 +400,6 @@ void SettingWindow::OnUIRender()
             reload = false;
             _settings.Save() ;
             _assets.Save() ;
-            spdlog::warn("Reloading Assets");
             KillEffectWindow::GetInstance().LoadAssets();
         }
     }
@@ -448,7 +444,6 @@ int SettingWindow::get_memory_consumption()
     if (GetProcessMemoryInfo(process, reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc), sizeof(pmc))) {
         return pmc.WorkingSetSize / (1024 * 1024)  ;
     } else {
-        spdlog::error("Error getting process memory information. Error code: {}",GetLastError() );
         exit(-1);
     }
 }
@@ -474,7 +469,6 @@ bool SettingWindow::CopyFile(const std::filesystem::path& sourcePath, const std:
         std::filesystem::copy(sourcePath, destPath, std::filesystem::copy_options::overwrite_existing);
         return true;
     } catch (const std::filesystem::filesystem_error& e) {
-        spdlog::error( "Error copying file: {}" , e.what());
         return false;
     }
 }

@@ -7,9 +7,7 @@
 #include <string>
 #include <filesystem>
 #include <json/json.h>
-#include <spdlog/spdlog.h>
 #include <fstream>
-#include <set>
 #include <app/WindowsFileDialog.h>
 
 
@@ -24,8 +22,6 @@ struct AssetConfig {
         enable_headshot = config["enable_headshot"].asBool();
         headshot_banner_folder = config["headshot_banner_folder"].asString();
         headshot_sound_file = config["headshot_sound_file"].asString();
-
-        spdlog::info("Asset named {} has been loaded.", asset_name);
     }
 
     void WriteToJson(Json::Value& config){
@@ -38,8 +34,6 @@ struct AssetConfig {
          config["enable_headshot"] = enable_headshot;
          config["headshot_banner_folder"] = headshot_banner_folder;
          config["headshot_sound_file"] = headshot_sound_file;
-
-         spdlog::info("Asset named {} has been saved.", asset_name);
     }
 
     std::string asset_name;
@@ -72,10 +66,8 @@ struct Assets{
                 memcpy(asset_names[i], asset_configs[i].asset_name.c_str(), asset_configs[i].asset_name.size());
             }
             file.close();
-            spdlog::warn("{} assets loaded.", assets["assets"].size());
         }
         else{
-            spdlog::error("Asset config file not found.");
             exit(-1);
         }
     }
@@ -101,7 +93,6 @@ struct Assets{
         std::ofstream file_(assets_file);
         file_ << assets;
         file_.close();
-        spdlog::warn("{} assets saved.", assets["assets"].size());
 
     }
 
