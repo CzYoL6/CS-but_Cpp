@@ -4,11 +4,13 @@
 
 #include <gui/Image.h>
 #include <GL/glu.h>
+#include <spdlog/spdlog.h>
 
 namespace GGgui {
     void Image::checkGLError() {
         GLenum error = glGetError();
         if (error != GL_NO_ERROR) {
+            spdlog::error( "OpenGL Error: {}" ,(char*)gluErrorString(error) );
             exit(-1);
         }
     }

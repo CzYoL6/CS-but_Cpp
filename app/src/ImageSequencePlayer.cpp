@@ -3,6 +3,7 @@
 //
 
 #include <app/ImageSequencePlayer.h>
+#include <spdlog/spdlog.h>
 ImageSequencePlayer::ImageSequencePlayer(int framerate, std::shared_ptr<GGgui::Image> framebuffer)
 :   _framerate(framerate), _current_frame_index(1),_playing(false),
     _accumulator(0), _framebuffer(framebuffer), _image_sequence(nullptr)
@@ -40,6 +41,7 @@ void ImageSequencePlayer::Update(float dt) {
             Stop();
             break;
         }
+//        spdlog::info("displaying {}.\n", current_frame_index())        ;
         SetToBuffer();
     }
 }

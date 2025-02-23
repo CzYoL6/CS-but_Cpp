@@ -4,6 +4,7 @@
 
 #include <format>
 #include <filesystem>
+#include <spdlog/spdlog.h>
 #include <app/KillEffectWindow.h>
 #include <gui/Application.h>
 #include <gui/Application.h>
@@ -58,6 +59,7 @@ void KillEffectWindow::OnAttach() {
         res.status=200;
     });
     _http_server_thread = std::thread([&]{
+        spdlog::warn("http server launched on port 3003.");
         _http_server.listen("127.0.0.1", 3003);
     }); (void )_http_server_thread;
 
@@ -79,6 +81,7 @@ void KillEffectWindow::Show() {
 
 void KillEffectWindow::OnUpdate(float ts) {
     Layer::OnUpdate(ts);
+//    spdlog::info("timestep: {}s\n", ts);
     if(_show_round_kill_effect_sign){
         std::lock_guard<std::mutex> l(_show_round_kill_effect_mutex);
         ShowRoundKillEffect(_show_round_kill_effect_count);
@@ -149,6 +152,7 @@ void KillEffectWindow::load_images_from_disk(float *progress, bool *load_complet
         *progress += 1.0f / (current_asset.max_kill_banner_count + (int) current_asset.enable_headshot);
     }
     *load_complete = true;
+    spdlog::warn("loading images to memory succeeded.");
 }
 
 

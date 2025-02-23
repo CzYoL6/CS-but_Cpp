@@ -10,6 +10,8 @@
 #include <imgui/imgui_impl_opengl3.h>
 #include <gui/Application.h>
 #include <glm/glm.hpp>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
 #include <soloud_wav.h>
 #include <conio.h>
 #include <windows.h>
@@ -146,6 +148,10 @@ namespace GGgui {
         // Set locale to support UTF-8
 		//std::locale::global(std::locale("en_US.UTF-8"));
 
+        // init logger
+        auto logger = spdlog::basic_logger_mt("file_logger", "logs.txt");
+        spdlog::set_default_logger(logger);
+
         // init soloud
         _soloud_core.init();
         for(int i = 0; i < 5; i++){
@@ -155,6 +161,8 @@ namespace GGgui {
         // Setup window
         glfwSetErrorCallback(glfw_error_callback);
         if (!glfwInit()) {
+//            std::cerr << "Could not initalize GLFW!\n";
+            spdlog::error("Could not initalize GLFW!");
             return;
         }
 
@@ -284,6 +292,7 @@ namespace GGgui {
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 0.0f);
         auto &io = ImGui::GetIO();
 
+        spdlog::warn("Application successfully launched.");
         // Main loop
         while (!glfwWindowShouldClose(m_WindowHandle) && m_Running) {
             int monitor_width, monitor_height;
@@ -415,6 +424,7 @@ namespace GGgui {
 
     void Application::Close() {
         m_Running = false;
+        spdlog::warn("Application exit.");
     }
 
     float Application::GetTime() {
@@ -453,6 +463,7 @@ namespace GGgui {
             props->GetValue(PKEY_Device_FriendlyName, &varName);
 
             std::string deviceName = WideToUTF8(varName.pwszVal);
+            spdlog::info("Get device {}: {}", i, deviceName);
             out_audio_devices.push_back(deviceName);
 
             PropVariantClear(&varName);
