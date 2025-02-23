@@ -211,8 +211,8 @@ void KillEffectWindow::handle_data(const Json::Value &data) {
 
 void KillEffectWindow::ShowRoundKillEffect(int round_kill) {
     const auto& current_asset = SettingWindow::GetInstance().current_asset();
-    int clamped_banner_index = min(round_kill, current_asset.max_kill_banner_count);
-    int clamped_audio_index = min(round_kill, current_asset.max_kill_sound_count);
+    int clamped_banner_index = std::min(round_kill, current_asset.max_kill_banner_count);
+    int clamped_audio_index =std::min(round_kill, current_asset.max_kill_sound_count);
 
     if(!SettingWindow::GetInstance().load_complete) return;
 

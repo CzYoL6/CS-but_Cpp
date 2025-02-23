@@ -5,14 +5,11 @@
 
 #include <iostream>
 #include <stdio.h>
-
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <gui/Application.h>
-#include <imgui/Roboto-Regular.embed>
 #include <glm/glm.hpp>
-#include <stb_image/stb_image.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <soloud_wav.h>
@@ -20,9 +17,30 @@
 #include <windows.h>
 #include <mmdeviceapi.h>
 #include <audioclient.h>
-#include <functiondiscoverykeys.h>
 #include <locale>
 #include <codecvt>
+
+#ifdef __MINGW32__
+
+#ifdef DEFINE_PROPERTYKEY
+#undef DEFINE_PROPERTYKEY
+#endif
+
+/* clang-format off */
+
+#define DEFINE_PROPERTYKEY(id, a, b, c, d, e, f, g, h, i, j, k, l) \
+	const PROPERTYKEY id = { { a,b,c, { d,e,f,g,h,i,j,k, } }, l };
+DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, \
+	0xa45c254e, 0xdf1c, 0x4efd, 0x80, \
+	0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 14);
+
+/* clang-format on */
+
+#else
+
+#include <functiondiscoverykeys_devpkey.h>
+
+#endif
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -226,9 +244,9 @@ namespace GGgui {
         // Load default font
         ImFontConfig fontConfig;
         fontConfig.FontDataOwnedByAtlas = false;
-        /*ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF((void *) g_RobotoRegular, sizeof(g_RobotoRegular), 15.0f,
-                                                            &fontConfig);
-        io.FontDefault = robotoFont;*/
+        fontConfig.OversampleH = 2;  // Lower oversampling to reduce size
+        fontConfig.OversampleV = 2;
+        fontConfig.PixelSnapH = true;  // Align to pixels for smaller texture
 
         io.Fonts->AddFontFromFileTTF("NotoSansCJKtc-Regular.otf", 20.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
 

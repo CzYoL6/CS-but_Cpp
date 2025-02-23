@@ -112,9 +112,10 @@ private:
     Settings _settings;
     Assets _assets;
 //    std::thread _hotkey_capture_thread;
-    static std::pair<int, int> get_memory_consumption(); // <virtual mem, physical mem> MB
+    static int get_memory_consumption(); // <virtual mem, physical mem> MB
 
     std::optional<std::string> ReadRegistryString(HKEY hKeyRoot, const std::string& subKey, const std::string& valueName);
+    bool CopyFile(const std::filesystem::path& sourcePath, const std::filesystem::path& destPath);
 
 public:
     static SettingWindow& GetInstance() {
@@ -124,6 +125,7 @@ public:
 
     std::optional<std::string> GetSteamInstallDir();
     std::optional<std::string> GetCS2InstallDir();
+    std::optional<std::string> GetGSIConfigPath();
 
 public:
     virtual void OnUIRender() override;

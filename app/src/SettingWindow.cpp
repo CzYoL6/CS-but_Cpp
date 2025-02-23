@@ -51,6 +51,21 @@ std::optional<std::string> SettingWindow::GetCS2InstallDir()
 	return std::nullopt;
 }
 
+std::optional<std::string> SettingWindow::GetGSIConfigPath()
+{
+	std::string gsi_cfg_position;
+	if (const std::optional<std::string> cs2_install_dir = GetCS2InstallDir(); cs2_install_dir.has_value()) {
+		gsi_cfg_position = cs2_install_dir.value() + "\\game\\csgo\\cfg\\gamestate_integration_csbut.cfg";
+
+		if (std::filesystem::exists(gsi_cfg_position)) {
+			return gsi_cfg_position;
+		}
+	}
+
+	return std::nullopt;
+
+}
+
 void SettingWindow::OnUIRender()
 {
     auto& app = GGgui::Application::Get();
@@ -73,11 +88,45 @@ void SettingWindow::OnUIRender()
 			if (ImGui::BeginTabBar("##Tabs1", ImGuiTabBarFlags_None)) {
 				if (ImGui::BeginTabItem("GSI")) {
 					ImGui::Spacing();
-					ImGui::BeginChild("gsi", ImVec2(0, 100), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-						if (ImGui::Button("A")) {
-							GetCS2InstallDir();
+					ImGui::BeginChild("gsi", ImVec2(0, 100), true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_HorizontalScrollbar);
+						static bool gsi_checked = false;
+						static std::string gsi_cfg_position;
+						static bool gsi_found = false;
+						if (ImGui::Button("Refresh") || !gsi_checked) {
+							gsi_checked = true;
+							if (auto gsi_cfg_path = GetGSIConfigPath(); gsi_cfg_path.has_value()) {
+								gsi_found = true;
+								gsi_cfg_position = gsi_cfg_path.value();
+							}
+							else {
+								gsi_cfg_position = "Cannot find game state integration config.";
+								gsi_found = false;
+							}
 						}
-						ImGui::InputText("Config Name", &_settings.gsi_cfg_name);
+						if (!gsi_found) {
+							ImGui::SameLine();
+							if (ImGui::Button("Install")) {
+								const std::string cfg_to_install = ".\\gamestate_integration_csbut.cfg";
+
+								if (const std::optional<std::string> cs2_install_dir = GetCS2InstallDir(); cs2_install_dir.has_value() && std::filesystem::exists(cfg_to_install)) {
+									const std::string install_pos = cs2_install_dir.value() + "\\game\\csgo\\cfg\\gamestate_integration_csbut.cfg";
+									if (CopyFile(cfg_to_install, install_pos )) {
+										// check cfg in next update
+										gsi_checked = false;
+									}
+								}
+							}
+						}
+						else {
+							ImGui::SameLine();
+							if(ImGui::Button("Uninstall")) {
+								std::filesystem::remove(gsi_cfg_position);
+								// check cfg in next update
+								gsi_checked = false;
+							}
+						}
+						ImGui::Text("%s", gsi_cfg_position.c_str());
+				
 					ImGui::EndChild();
 					ImGui::EndTabItem();
 				}
@@ -85,12 +134,13 @@ void SettingWindow::OnUIRender()
                 {
 					ImGui::Spacing();
 					ImGui::BeginChild("monitor", ImVec2(0, 100), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-
-   						ImGui::Text("Memory Consumption");
 						ImGui::Spacing();
-						auto mem = get_memory_consumption();
-						ImGui::Text("Virtual Memory: %d MB", mem.first);
-						ImGui::Text("Physical Memory: %d MB", mem.second);
+						static int mem = get_memory_consumption();
+						if (ImGui::Button("Refresh")) {
+							mem = get_memory_consumption();
+						}
+						ImGui::Spacing();
+						ImGui::Text("Physical Memory: %d MB", mem);
 
 					ImGui::EndChild();
 					ImGui::EndTabItem();
@@ -391,11 +441,12 @@ void SettingWindow::OnDetach() {
 //    if(_hotkey_capture_thread.joinable()) _hotkey_capture_thread.join();
 }
 
-std::pair<int, int> SettingWindow::get_memory_consumption(){
+int SettingWindow::get_memory_consumption()
+{
     static HANDLE process = GetCurrentProcess();
     PROCESS_MEMORY_COUNTERS_EX pmc;
     if (GetProcessMemoryInfo(process, reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc), sizeof(pmc))) {
-        return {pmc.PrivateUsage / (1024 * 1024), pmc.WorkingSetSize / (1024 * 1024)  };
+        return pmc.WorkingSetSize / (1024 * 1024)  ;
     } else {
         spdlog::error("Error getting process memory information. Error code: {}",GetLastError() );
         exit(-1);
@@ -415,4 +466,15 @@ std::optional<std::string> SettingWindow::ReadRegistryString(HKEY hKeyRoot, cons
         RegCloseKey(hKey);
     }
     return std::nullopt;
+}
+
+bool SettingWindow::CopyFile(const std::filesystem::path& sourcePath, const std::filesystem::path& destPath)
+{
+    try {
+        std::filesystem::copy(sourcePath, destPath, std::filesystem::copy_options::overwrite_existing);
+        return true;
+    } catch (const std::filesystem::filesystem_error& e) {
+        spdlog::error( "Error copying file: {}" , e.what());
+        return false;
+    }
 }
